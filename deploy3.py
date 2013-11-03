@@ -1,7 +1,6 @@
 # -*- coding:utf-8 -*-
 
 import os, re, json, sqlite3, codecs, time, deployconfig as config, base64, sys
-sys.path+= ['e:/develop/python33/Lib/site-packages/win32/', 'e:/develop/python33/Lib/site-packages/win32/lib/']
 
 def joinFiles():
     global addons
