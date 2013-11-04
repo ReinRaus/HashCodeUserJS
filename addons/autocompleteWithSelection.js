@@ -41,8 +41,8 @@ function __autocompleteWithSelection() {
             if (e.charCode==32 && e.target.adduser!=null) {
                 short=e.target.value.substring(e.target.adduser+1, e.target.selectionStart).toLowerCase();
                 long= e.target.value.substring(e.target.adduser+1, e.target.selectionEnd);
-                var find= null;
-                nextFindIsResult= false;
+                var find= null; // результат поика в массиве
+                nextFindIsResult= (short=="" && long==""); // для прокрутки пробелом, если пробел сразу после собаки, и ничем не дополнено, то дополняем первым значением из массива
                 for (var i in usersLow) {
                     if (usersLow[i]==long.toLowerCase()) {
                         nextFindIsResult=true;
@@ -53,7 +53,7 @@ function __autocompleteWithSelection() {
                         break;
                     }
                 }
-                if (nextFindIsResult && find==null) {
+                if (nextFindIsResult && (find==null || find=="")) {
                     for (var i in usersLow) {
                         if (usersLow[i].indexOf(short)==0) {
                             find= users[usersLow[i]];
@@ -90,5 +90,4 @@ function __autocompleteWithSelection() {
             }
         }
     );
-    console.log(users);
 };
