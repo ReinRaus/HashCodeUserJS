@@ -17,7 +17,7 @@ function __addonLoader() {
         htmlDiv+="></TD><TD>"+__addons[i].replace("__", "")+"</TD></TR>";
     };
     htmlDiv+="</TABLE>";
-    console.log(htmlDiv);
+    //console.log(htmlDiv);
     div1.innerHTML=htmlDiv;
     var img=document.createElement('img');
     img.src="[DEPLOY:image64]images/icon.png[/DEPLOY]";
