@@ -1,4 +1,4 @@
-var __addonsStarted= false;
+﻿var __addonsStarted= false;
 
 function __toogleEnabled(name, value){
     value= value? "yes":"no";

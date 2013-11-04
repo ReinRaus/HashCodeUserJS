@@ -1,15 +1,16 @@
 # -*- coding:utf-8 -*-
 
 import os, re, json, sqlite3, codecs, time, deployconfig as config, base64, sys
+sys.path+= ['e:/develop/python33/Lib/site-packages/win32/', 'e:/develop/python33/Lib/site-packages/win32/lib/']
 
 def joinFiles():
     global addons
     result="\nvar __addons=['"+"', '".join(["__"+k[::-1].replace("sj.", "", 1)[::-1] for k in addons])+"'];\n"
     with open("userjsloader.js") as f:
-        result+= f.read()+"\n"
+        result+= deleteBOM(f.read())+"\n"
     for i in addons:
         with open("./addons/"+i, "r") as f:
-            result+=f.read()+"\n"
+            result+= deleteBOM(f.read())+"\n"
     regex= re.compile(r'\[DEPLOY:image64\](.*?)\[/DEPLOY\]', re.I)
     match= regex.search(result)
     while match:
@@ -17,6 +18,12 @@ def joinFiles():
         match= regex.search(result, match.end())
     return result
 
+def deleteBOM(text):
+    if text[:3]=="п»ї":
+        return text[3:]
+    else:
+        return text
+    
 def getDataURL(imgPath):
     result= "data:image/"+imgPath.split(".")[-1]+";base64,"
     with open("./"+imgPath, "br") as f:
@@ -25,7 +32,7 @@ def getDataURL(imgPath):
 def createForChrome():
     global joinedFiles
     with open("chromejson.txt") as f:
-        chromeJson= json.loads( f.read() )
+        chromeJson= json.loads( deleteBOM(f.read()) )
     chromeJson["html"]="<script>\n"+joinedFiles+"\n</script>"
     with open("./release/ChromeDump.json", "w") as f:
         f.write(json.dumps(chromeJson))
@@ -36,7 +43,7 @@ def createForFireFox():
     global joinedFiles
     with open("userjsheaders.txt", "br") as f:
         with open("./release/FireFox.user.js", "bw") as f2:
-            f2.write(f.read()+b"\n")
+            f2.write(f.read()+b"\n") # BOM нужно оставить
             f2.write(b"function __extension__wrapper__(){\n")
             f2.write(joinedFiles.encode('utf-8'))
             f2.write(b"\n};\nvar script = document.createElement('script');\n")

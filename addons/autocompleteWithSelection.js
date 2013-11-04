@@ -1,14 +1,14 @@
-function __autocompleteWithSelection() {
+п»їfunction __autocompleteWithSelection() {
 
-    var arrayUnique = function(a) { // оставляет в массиве только уникальные значения
+    var arrayUnique = function(a) { // РѕСЃС‚Р°РІР»СЏРµС‚ РІ РјР°СЃСЃРёРІРµ С‚РѕР»СЊРєРѕ СѓРЅРёРєР°Р»СЊРЅС‹Рµ Р·РЅР°С‡РµРЅРёСЏ
         return a.reduce(function(p, c) {
             if (p.indexOf(c) < 0) p.push(c);
             return p;
         }, []);
     };
     
-    // target- поле ввода, text- полное совпадение, matchText- частичное совпадение, например
-    // имея на входе "test" и "te" будет выделено "st" te[st]
+    // target- РїРѕР»Рµ РІРІРѕРґР°, text- РїРѕР»РЅРѕРµ СЃРѕРІРїР°РґРµРЅРёРµ, matchText- С‡Р°СЃС‚РёС‡РЅРѕРµ СЃРѕРІРїР°РґРµРЅРёРµ, РЅР°РїСЂРёРјРµСЂ
+    // РёРјРµСЏ РЅР° РІС…РѕРґРµ "test" Рё "te" Р±СѓРґРµС‚ РІС‹РґРµР»РµРЅРѕ "st" te[st]
     var completeSelection= function( target, text, matchText) {
         target.value=target.value.substring(0, target.adduser+1)+text+target.value.substring(target.selectionEnd);
         target.selectionStart= target.adduser+matchText.length+1;
@@ -21,28 +21,28 @@ function __autocompleteWithSelection() {
     var usersLow= Array()
     var regexLoginClear1= new RegExp("(?:^@)|\\s*\u2666+", 'ig');
     var regexLoginClear2= new RegExp("<span[^>]*>([^<]+)<\/span>", "ig");
-    // сначала находим все логины, которые есть на странице и оставляем из них только уникальные в нижнем регистре
+    // СЃРЅР°С‡Р°Р»Р° РЅР°С…РѕРґРёРј РІСЃРµ Р»РѕРіРёРЅС‹, РєРѕС‚РѕСЂС‹Рµ РµСЃС‚СЊ РЅР° СЃС‚СЂР°РЅРёС†Рµ Рё РѕСЃС‚Р°РІР»СЏРµРј РёР· РЅРёС… С‚РѕР»СЊРєРѕ СѓРЅРёРєР°Р»СЊРЅС‹Рµ РІ РЅРёР¶РЅРµРј СЂРµРіРёСЃС‚СЂРµ
     while ( (match=regexUsers.exec(document.body.innerHTML)) != null ) {
         var userLogin= match[1].replace(regexLoginClear2, "$1").replace(regexLoginClear1, '');
         usersLow.push(userLogin.toLowerCase());
         users[userLogin.toLowerCase()]=userLogin;
     };
     usersLow= arrayUnique(usersLow);
-    // если курсор ушел влево от собаки или на 30 символов правее, то перестаем отслеживать
+    // РµСЃР»Рё РєСѓСЂСЃРѕСЂ СѓС€РµР» РІР»РµРІРѕ РѕС‚ СЃРѕР±Р°РєРё РёР»Рё РЅР° 30 СЃРёРјРІРѕР»РѕРІ РїСЂР°РІРµРµ, С‚Рѕ РїРµСЂРµСЃС‚Р°РµРј РѕС‚СЃР»РµР¶РёРІР°С‚СЊ
     $("textarea").bind("keydown", function(e) {
         if (e.target.adduser>=e.target.selectionEnd || e.target.adduser+30<e.target.selectionStart) e.target.adduser= null;
     });
     $("textarea").bind("keypress", function(e){
-            // нажали собаку- начали отслеживать
+            // РЅР°Р¶Р°Р»Рё СЃРѕР±Р°РєСѓ- РЅР°С‡Р°Р»Рё РѕС‚СЃР»РµР¶РёРІР°С‚СЊ
             if (e.charCode==64) {
                 e.target.adduser=e.target.selectionStart;
             }
-            // пробел
+            // РїСЂРѕР±РµР»
             if (e.charCode==32 && e.target.adduser!=null) {
                 short=e.target.value.substring(e.target.adduser+1, e.target.selectionStart).toLowerCase();
                 long= e.target.value.substring(e.target.adduser+1, e.target.selectionEnd);
-                var find= null; // результат поика в массиве
-                nextFindIsResult= (short=="" && long==""); // для прокрутки пробелом, если пробел сразу после собаки, и ничем не дополнено, то дополняем первым значением из массива
+                var find= null; // СЂРµР·СѓР»СЊС‚Р°С‚ РїРѕРёРєР° РІ РјР°СЃСЃРёРІРµ
+                nextFindIsResult= (short=="" && long==""); // РґР»СЏ РїСЂРѕРєСЂСѓС‚РєРё РїСЂРѕР±РµР»РѕРј, РµСЃР»Рё РїСЂРѕР±РµР» СЃСЂР°Р·Сѓ РїРѕСЃР»Рµ СЃРѕР±Р°РєРё, Рё РЅРёС‡РµРј РЅРµ РґРѕРїРѕР»РЅРµРЅРѕ, С‚Рѕ РґРѕРїРѕР»РЅСЏРµРј РїРµСЂРІС‹Рј Р·РЅР°С‡РµРЅРёРµРј РёР· РјР°СЃСЃРёРІР°
                 for (var i in usersLow) {
                     if (usersLow[i]==long.toLowerCase()) {
                         nextFindIsResult=true;
@@ -62,7 +62,7 @@ function __autocompleteWithSelection() {
                     }
                 }
                 //console.log([find, long, short]);
-                if (find) { // если совпадение одно, то добавляем запятую и переносим курсор
+                if (find) { // РµСЃР»Рё СЃРѕРІРїР°РґРµРЅРёРµ РѕРґРЅРѕ, С‚Рѕ РґРѕР±Р°РІР»СЏРµРј Р·Р°РїСЏС‚СѓСЋ Рё РїРµСЂРµРЅРѕСЃРёРј РєСѓСЂСЃРѕСЂ
                     if (find==long) find+=",";
                     completeSelection(e.target, find, short);
                     if (find==long+",") {
@@ -72,7 +72,7 @@ function __autocompleteWithSelection() {
                     return false;
                 }
             };
-            // кнопки отличные от пробела и собаки, пытаемся найти совпадение
+            // РєРЅРѕРїРєРё РѕС‚Р»РёС‡РЅС‹Рµ РѕС‚ РїСЂРѕР±РµР»Р° Рё СЃРѕР±Р°РєРё, РїС‹С‚Р°РµРјСЃСЏ РЅР°Р№С‚Рё СЃРѕРІРїР°РґРµРЅРёРµ
             if (e.target.adduser!=null && e.target.adduser<e.target.selectionStart) {
                 var short= (e.target.value.substring(e.target.adduser+1, e.target.selectionStart)+String.fromCharCode(e.charCode)).toLowerCase();
                 //console.log(short);
