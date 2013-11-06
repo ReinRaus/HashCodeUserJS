@@ -62,12 +62,14 @@ window.setTimeout(__check__Started, 300);
 ﻿// @author Yura Ivanov
 function __autocompleteWithLinks() {
     if (typeof $ != 'undefined') {
+        var currentLogin= $("#searchBar a")[0].innerHTML.toLowerCase(); // логин самого участника
         if ($("#question-table").length) {
             var users = [];
             var a = "";
             function addUser(name, link, type) {
-                name = name.replace(/@| ♦+/, '');
-                if (users.indexOf(link) < 0) {
+                var regexClean= new RegExp("(?:^@)|\\s*\u2666+", 'ig');
+                name = name.replace(regexClean, '');
+                if (users.indexOf(link) < 0 && name.toLowerCase()!=currentLogin && name!="") {
                     users.push(link);
                     return "<li><a href='#' class='user_quote'>@" + name
                             + "</a> - " + type + "</li>";
@@ -121,8 +123,10 @@ function __autocompleteWithLinks() {
                                     + myValue
                                     + myField.value.substring(endPos,
                                             myField.value.length);
+                            myField.selectionStart= myField.selectionEnd= startPos+ myValue.length;
                         } else {
                             myField.value += myValue;
+                            myField.selectionStart= myField.selectionEnd= myField.value.length;
                         }
                         myField.focus();
                     });
@@ -147,6 +151,7 @@ function __autocompleteWithLinks() {
         // console.log([value, target.adduser, target.selectionStart]);
     };
     
+    var currentLogin= $("#searchBar a")[0].innerHTML.toLowerCase(); // логин самого участника
     var regexUsers = new RegExp("<a\\s[^>]*href\\s*=\\s*\"\/users\/\\d(?![^>]*\/(?:reputation|subscriptions)\/)[^>]*>([\\s\\S]*?)<\/a>", 'ig');
     var users = Array();
     var usersLow= Array()
@@ -155,8 +160,11 @@ function __autocompleteWithLinks() {
     // сначала находим все логины, которые есть на странице и оставляем из них только уникальные в нижнем регистре
     while ( (match=regexUsers.exec(document.body.innerHTML)) != null ) {
         var userLogin= match[1].replace(regexLoginClear2, "$1").replace(regexLoginClear1, '');
-        usersLow.push(userLogin.toLowerCase());
-        users[userLogin.toLowerCase()]=userLogin;
+        var userLoginLow= userLogin.toLowerCase();
+        if (currentLogin != userLoginLow) { // свой логин исключаем
+            usersLow.push(userLoginLow);
+            users[userLoginLow]=userLogin;
+        }
     };
     usersLow= arrayUnique(usersLow);
     // если курсор ушел влево от собаки или на 30 символов правее, то перестаем отслеживать

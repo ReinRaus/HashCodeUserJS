@@ -16,6 +16,7 @@
         // console.log([value, target.adduser, target.selectionStart]);
     };
     
+    var currentLogin= $("#searchBar a")[0].innerHTML.toLowerCase(); // логин самого участника
     var regexUsers = new RegExp("<a\\s[^>]*href\\s*=\\s*\"\/users\/\\d(?![^>]*\/(?:reputation|subscriptions)\/)[^>]*>([\\s\\S]*?)<\/a>", 'ig');
     var users = Array();
     var usersLow= Array()
@@ -24,8 +25,11 @@
     // сначала находим все логины, которые есть на странице и оставляем из них только уникальные в нижнем регистре
     while ( (match=regexUsers.exec(document.body.innerHTML)) != null ) {
         var userLogin= match[1].replace(regexLoginClear2, "$1").replace(regexLoginClear1, '');
-        usersLow.push(userLogin.toLowerCase());
-        users[userLogin.toLowerCase()]=userLogin;
+        var userLoginLow= userLogin.toLowerCase();
+        if (currentLogin != userLoginLow) { // свой логин исключаем
+            usersLow.push(userLoginLow);
+            users[userLoginLow]=userLogin;
+        }
     };
     usersLow= arrayUnique(usersLow);
     // если курсор ушел влево от собаки или на 30 символов правее, то перестаем отслеживать
