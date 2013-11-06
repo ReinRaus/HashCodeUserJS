@@ -1,5 +1,9 @@
 ﻿// ==UserScript==
 // @name            HashCode Addons 
 // @include         http://hashcode.ru/*
-// @include         http://meta.hashcode.ru/*
+// @include         http://*.hashcode.ru/*
+// @include         http://bitcode.ru/*
+// @include         http://rootcode.ru/*
+// @include         http://*.sezn.ru/*
+// @include         http://sezn.ru/*
 // ==/UserScript==
