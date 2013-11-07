@@ -27,7 +27,7 @@ function __newAnswersAndComments() {
     }
   });
  var $nav = $("<div class='boxC'></div>");
- $nav.append("<p>ответы<br>" + "<strong>всего<span style=\"letter-spacing: 0.8ex;\">&nbsp</span>: " + nowanswers.length + "</strong><br>" + "<strong>новых  " + (nowanswers.length - readanswers.length) + "</strong><br></p>" + "<p>комментарии<br>" + "<strong>всего<span style=\"letter-spacing: 0.8ex;\">&nbsp</span>: " + nowcomments.length + "</strong><br>" + "<strong>новых  " + (nowcomments.length - readcomments.length) + "</strong><br></p>");
+ $nav.append("<p>ответы<br>" + "<strong>всего<span style=\"letter-spacing: 0.8ex;\">&nbsp</span>: " + nowanswers.length + "</strong><br>" + "<strong>новых : " + (nowanswers.length - readanswers.length) + "</strong><br></p>" + "<p>комментарии<br>" + "<strong>всего<span style=\"letter-spacing: 0.8ex;\">&nbsp</span>: " + nowcomments.length + "</strong><br>" + "<strong>новых : " + (nowcomments.length - readcomments.length) + "</strong><br></p>");
  $nav.insertAfter(document.getElementById('CARight').children[0]);
  window.localStorage.setItem('__read_answers_' + qid, JSON.stringify(nowanswers));
  window.localStorage.setItem('__read_comments_' + qid, JSON.stringify(nowcomments));
