@@ -1,6 +1,6 @@
 // @author Yura Ivanov
 function __newAnswersAndComments() {
-  var regexURL= new RegExp("^https?://[^/]+/questions/.*$", "i");
+  var regexURL= new RegExp("^https?://[^/]+/(?:questions|research)/.*$", "i");
   if (!regexURL.test(location.href)) return; // если не вопрос, то не работаем
   var qid = $("a.post-vote.up").attr("href").replace('/vote/', '').replace('/up', '');
   var qopened = window.localStorage.getItem('__opened_' + qid);
