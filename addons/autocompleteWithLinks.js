@@ -1,5 +1,13 @@
 ﻿// @author Yura Ivanov
 function __autocompleteWithLinks() {
+    var defaultSettings= {
+        title: 'Список участников',
+        description: 'Выводит рядом с полями для ввода ответа и комментариев плашку с никами участников, которые принимали участие в дискуссии текущего вопроса.<BR/>Вставка ника участника в поле ввода в один клик.',
+        /*exports: {
+        },
+        order: []*/
+    };
+    var settings= __addonsSettings.getUpdatedSettings( arguments.callee.name, defaultSettings );
     if (typeof $ != 'undefined') {
         var currentLogin= $("#searchBar a")[0].innerHTML.toLowerCase(); // логин самого участника
         if ($("#question-table").length) {

@@ -151,7 +151,6 @@ var __addonsSettings= new (function() {
               };
               oldSettings.exports= newExports;
               if (updated) this.set( addonName, oldSettings);
-              console.log(oldSettings);
               return oldSettings;
          } else {
               this.set(addonName, defaultSettings);

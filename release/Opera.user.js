@@ -164,7 +164,6 @@ var __addonsSettings= new (function() {
               };
               oldSettings.exports= newExports;
               if (updated) this.set( addonName, oldSettings);
-              console.log(oldSettings);
               return oldSettings;
          } else {
               this.set(addonName, defaultSettings);
@@ -231,6 +230,14 @@ window.setTimeout(__check__Started, 300);
 
 ﻿// @author Yura Ivanov
 function __autocompleteWithLinks() {
+    var defaultSettings= {
+        title: 'Список участников',
+        description: 'Выводит рядом с полями для ввода ответа и комментариев плашку с никами участников, которые принимали участие в дискуссии текущего вопроса.<BR/>Вставка ника участника в поле ввода в один клик.',
+        /*exports: {
+        },
+        order: []*/
+    };
+    var settings= __addonsSettings.getUpdatedSettings( arguments.callee.name, defaultSettings );
     if (typeof $ != 'undefined') {
         var currentLogin= $("#searchBar a")[0].innerHTML.toLowerCase(); // логин самого участника
         if ($("#question-table").length) {
@@ -415,6 +422,14 @@ function __autocompleteWithLinks() {
 
 // @author Yura Ivanov
 function __newAnswersAndComments() {
+  var defaultSettings= {
+        title: 'Подсветка новых сообщений',
+        description: 'Новые ответы и комментарии выделяются цветом, что делает поиск обновлений в вопросе значительно быстрее.',
+        /*exports: {
+        },
+        order: []*/
+    };
+  var settings= __addonsSettings.getUpdatedSettings( arguments.callee.name, defaultSettings );
   var regexURL= new RegExp("^https?://[^/]+/(?:questions|research)/.*$", "i");
   if (!regexURL.test(location.href)) return; // если не вопрос, то не работаем
   var qid = $("a.post-vote.up").attr("href").replace('/vote/', '').replace('/up', '');
