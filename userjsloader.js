@@ -47,7 +47,9 @@ function __openSettingsPage(addonName, targetItem) {
                      } else if (param.type=='select') {
                          html+="<SELECT name='"+paramId+"' value='"+escapeHtml(param.value)+"'>";
                          for (var j in param.options) {
-                             html+="<OPTION value='"+escapeHtml(j)+"'>"+param.options[j]+"</OPTION>";
+                             html+="<OPTION value='"+escapeHtml(j)+"' ";
+                             if (j==param.value) html+= "selected ";
+                             html+=">"+param.options[j]+"</OPTION>";
                          };
                          html+="</SELECT>";
                      };
@@ -59,6 +61,35 @@ function __openSettingsPage(addonName, targetItem) {
         $("#__addonspage"+addonName).html(html);
     }
     $("#__addonspage"+addonName).css("display", "block");
+};
+
+function __saveAddonsSettings() {
+    for (var addonName in __addonsSettings.settings) {
+        var settings= __addonsSettings.settings[addonName];
+        for (var i in settings.exports) {
+            var paramId= "__addonsSettingsValue"+addonName+"_"+i;
+            var param= settings.exports[i];
+            var params= document.getElementsByName(paramId);
+            if (params.length>0) {
+                if (param.type=='text' || param.type=='select') {
+                    var value= params[0].value;
+                } else if (param.type=='checkbox') {
+                    var value= params[0].checked?'1':'0';
+                } else if (param.type=='radio') {
+                    for (var j=0; j<params.length; j++) {
+                        if (params[j].checked) {
+                            var value= params[j].value;
+                            break;
+                        }
+                    }
+                }
+                //console.log([addonName, i, value]);
+                __addonsSettings.settings[addonName].exports[i].value= value;
+            }
+        }
+    };
+    __addonsSettings.set();
+    location.reload();
 };
 function __addonsAddCSS (csstext) {
     var head = document.getElementsByTagName('head')[0]; 
@@ -86,7 +117,7 @@ var __addonsSettings= new (function() {
     };
     
     this.set= function (addonName, settings) {
-        this.settings[addonName]= settings;
+        if (addonName!=undefined && settings!=undefined) this.settings[addonName]= settings;
         localStorage['__addonsSettings']= JSON.stringify(this.settings);
     };
     
@@ -165,7 +196,7 @@ function __addonLoader() {
         htmlDiv+="></TD><TD class='cursor-pointer'>"+name+"</TD></TR>";
         htmlDiv2+="<DIV class='addons-page' id='__addonspage"+__addons[i]+"'></DIV>";
     };
-    htmlDiv+="</TABLE></DIV></TD><TD width='*' valign=top>"+htmlDiv2+"</TD></TR></TABLE></DIV><BUTTON onclick='__saveAddonsSettings'>Сохранить</BUTTON>";
+    htmlDiv+="</TABLE></DIV></TD><TD width='*' valign=top>"+htmlDiv2+"</TD></TR></TABLE></DIV><BUTTON onclick='__saveAddonsSettings()'>Сохранить</BUTTON>";
     //console.log(htmlDiv);
     div1.style.top=(imgRect.top+imgRect.height+5)+"px";
     div1.style.left=(imgRect.left-150)+"px";

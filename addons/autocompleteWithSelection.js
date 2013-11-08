@@ -2,12 +2,13 @@
     var defaultSettings= {
         title: 'Автодополнение собаки по пробелу',
         description: 'Дополняет в поле ввода собаку ником участника, отметившегося на странице. Если дополнить можно несколькими вариантами, то пробел перебирает возможные продолжения. Если просто ввести собаку и нажимать пробел, то будут перебираться все ники. Если возможное продолжение только одно, то курсор переносится за него. Чтобы просто ввести собаку нужно нажать собаку и клавиши влево-вправо.',
-        exports: {
+        /*exports: {
             test3: {type:'text', value:'sdf', title:'Введите текст'},
             test2:  {type:'checkbox', value:'1', title:'Введите текст'},
-            test4: {type:'select', value:'2', title:'radio', options:{'1':'opt1', '2':'opt2'} }
+            test4: {type:'radio', value:'2', title:'radio', options:{'1':'opt1', '2':'opt2'} },
+            test1: {type:'select', value:'2', title:'radio', options:{'1':'sel1', '2':'sel2'} }
         },
-        order: ['test2', 'test4', 'test3']
+        order: ['test2', 'test4', 'test3', 'test1']*/
     };
     var settings= __addonsSettings.getUpdatedSettings( arguments.callee.name, defaultSettings );
     
