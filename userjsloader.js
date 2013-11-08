@@ -89,7 +89,42 @@ function __saveAddonsSettings() {
         }
     };
     __addonsSettings.set();
-    location.reload();
+    var sezn='hashcode.ru math.hashcode.ru careers.hashcode.ru russ.hashcode.ru games.sezn.ru turism.sezn.ru foto.sezn.ru hm.sezn.ru meta.hashcode.ru admin.hashcode.ru user.hashcode.ru phys.sezn.ru english.sezn.ru'.split(' ');
+    var thisDomain= location.href.replace(new RegExp("^https?://([^/]+)/.*$", "i"), "\1");
+    var frames={};
+    window.addEventListener("message", function(message, url){
+        if (message.data.substring(0, 13)=="SettingsSets:"){
+            frames[message.data.substring(13)][1]=true;
+        }
+    });
+    $("#__div_options").html("<h3>Идет сохранение настроек, это может занять некоторое время</h3><br/>Сохранено <span id='__addons_span_count'>0</span> сайтов из "+sezn.length);
+    for (var i=0; i<sezn.length; i++) {
+        if (location.hostname!=sezn[i]){
+            var frame= document.createElement("iframe");
+            frame.width=frame.height='1px';
+            frame.onload= function(){
+                var iframe=this;
+                window.setTimeout(function(){
+                        iframe.contentWindow.postMessage("SetSettings:"+JSON.stringify(__addonsSettings.settings), "*");
+                    }, 1500, false);
+            };
+            frame.src='http://'+sezn[i]+"/about/";
+            frames[sezn[i]]=[frame, false];
+            document.body.appendChild(frame);
+        } else {
+            frames[sezn[i]]=[null, true];
+        }
+    };
+    window.setInterval(function(){
+        var count=0;
+        for (var i=0; i<sezn.length; i++) {
+            if (frames[sezn[i]][1]) {
+                count++;
+            }
+        };
+        $("#__addons_span_count").html(count);
+        if (count==sezn.length) location.reload();
+    }, 1000, false);
 };
 function __addonsAddCSS (csstext) {
     var head = document.getElementsByTagName('head')[0]; 
@@ -161,6 +196,17 @@ var __addonsSettings= new (function() {
 
 function __addonLoader() {
     __addonsStarted= true;
+    window.addEventListener("message", function(message, url){
+        if (message.data.substring(0, 12)=="SetSettings:"){
+            var settings= JSON.parse(message.data.substring(12));
+            for (var addonName in settings) {
+                if (__addonsSettings.settings[addonName]== undefined) __addonsSettings.settings[addonName]={};
+                __addonsSettings.settings[addonName].exports=settings[addonName].exports
+            }
+            __addonsSettings.set();
+            message.source.postMessage("SettingsSets:"+location.hostname, '*');
+        }
+        }, false);
     var css= "div.addons-settings {position: absolute; display:none; width:50%; height:50%; background-color: #EEEEEE; border:1px solid blue; max-width:51%; max-height:51%;} div.addons-overflow {overflow-y:auto; oferflow-x:hidden; height:90%; max-height:91%}; .addons-leftpanel {}; div.addons-itemlist {margin-left:0px; padding-left:0px; width:100%} .cursor-pointer {cursor:pointer} .addons-page {display:none}";
     __addonsAddCSS(css);
     
