@@ -1,4 +1,12 @@
-function __sortBetter() {
+﻿function __sortBetter() {
+        var defaultSettings= {
+            title: 'Улучшенная сортировка',
+            description: 'Улучшает сортировку вопросов.',
+            /*exports: {
+            },
+            order: []*/
+        };
+        var settings= __addonsSettings.getUpdatedSettings( arguments.callee.name, defaultSettings );
         var userlink=$('#searchBar a').first().attr('href');
         $('#listA')
                 .prepend(
