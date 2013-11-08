@@ -1,5 +1,16 @@
 ﻿function __autocompleteWithSelection() {
-
+    var defaultSettings= {
+        title: 'Автодополнение собаки по пробелу',
+        description: 'Дополняет в поле ввода собаку ником участника, отметившегося на странице. Если дополнить можно несколькими вариантами, то пробел перебирает возможные продолжения. Если просто ввести собаку и нажимать пробел, то будут перебираться все ники. Если возможное продолжение только одно, то курсор переносится за него. Чтобы просто ввести собаку нужно нажать собаку и клавиши влево-вправо.',
+        exports: {
+            test3: {type:'text', value:'sdf', title:'Введите текст'},
+            test2:  {type:'checkbox', value:'1', title:'Введите текст'},
+            test4: {type:'select', value:'2', title:'radio', options:{'1':'opt1', '2':'opt2'} }
+        },
+        order: ['test2', 'test4', 'test3']
+    };
+    var settings= __addonsSettings.getUpdatedSettings( arguments.callee.name, defaultSettings );
+    
     var arrayUnique = function(a) { // оставляет в массиве только уникальные значения
         return a.reduce(function(p, c) {
             if (p.indexOf(c) < 0) p.push(c);
