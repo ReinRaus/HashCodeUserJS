@@ -5,5 +5,4 @@
 // @include         http://bitcode.ru/*
 // @include         http://rootcode.ru/*
 // @include         http://*.sezn.ru/*
-// @include         http://sezn.ru/*
 // ==/UserScript==
