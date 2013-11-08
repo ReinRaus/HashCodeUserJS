@@ -24,21 +24,27 @@
 Желательно использовать следующий механизм для хранения данных аддона:  
 
     function __test() {
-        var settings= __addonsGetSettings(arguments.callee.name);
-        if (settings == null) settings= { /* default */ };
-        __addonsSetSettings(arguments.callee.name);
+        var settings= __addonsSettings.get(arguments.callee.name);
+        if (settings == null) settings= {
+            title: 'Ваш город', // title отвечает за заголовок, которым будет представлен аддон
+            description: 'Показывает город участника.' // description содержит описание
+        };
+        __addonsSettings.set(arguments.callee.name);
     };
-Если в настройках будет присутствовать элемент `import`, то эти настройки будут отображаться в настройках аддона.  
+Если в настройках будет присутствовать элемент `exports`, то эти настройки будут отображаться в настройках аддона. `order` в свою очередь будет отвечать за порядок в котором настройки будут выведены на экран, если настройки нет в `order`, то на экран она выведена не будет. `value` это значение по умолчанию, оно может быть определено пользователем и его надо считывать, чтобы узнать значение настройки.    
 Возможны следующие типы настроек:  
 
     var defaultSettings= {
-        import: {
+        exports: {
             bgcolor: {type: 'text', value:'bebebe', title:'Цвет фона:'},
             usebgcolor: {type: 'checkbox', value='1', title:'Использовать цвет фона'},
             country: {type: 'select', value='1', title:'Ваш город:', options:{'1':'Даллас', '2':'Вегас'} },
             hideCountry: {type: 'radio', value='1', title:'Скрывать Ваш город:', options:{'1':'Нет', '2':'Да'} }
-        ]
+        },
+        order: ['bgcolor', 'country', 'hideCountry', 'usebgcolor'],
+        title: 'Ваш город'
     };
+    var settings= __addonsSettings.getUpdatedSettings( arguments.callee.name, defaultSettings );
     
 `deploy.py` способен автоматически обновлять расширение в Хроме, но для этого нужно, чтобы не были открыты вкладки с настройками расширений, и изменения вступят в силу после перезапуска Хрома. В целом, это быстрее, чем вручную импортировать код в расширение.  
 Если включено автоматическое обновление расширения Хрома, и деплой выдает ошибку, то это значит, что либо Хром запущен с открытой вкладкой настроек расширения, либо отсутствует локальное хранилище расширения. Необходимо создать любое правило и сохранить.  

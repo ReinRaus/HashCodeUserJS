@@ -5,33 +5,172 @@ function __toogleEnabled(name, value){
     localStorage["__Enable__"+name]= value;
 };
 
+function __openSettingsPage(addonName, targetItem) {
+    var escapeHtml= function(text) {
+      return text
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+    };
+    $("#__div_options .addons-leftpanel tr").css("background-color", "#EEEEEE");
+    targetItem.style.backgroundColor="#3060a8";
+    $(".addons-page").css("display", "none");
+    if ($("#__addonspage"+addonName).html()=="") {
+        var html="";
+        var settings= __addonsSettings.settings[addonName];
+        if (settings==undefined) {
+             html= "Настройки отсутствуют";
+        } else {
+             if (settings.title!=undefined) html+="<h3>"+settings.title+"</h3>";
+             if (settings.description!=undefined) html+="<div class='addons-description'>"+settings.description+"</div>";
+             if (settings.order!=undefined){
+                 html+="<table>";
+                 for (var i=0; i<settings.order.length; i++) {
+                     var paramName= settings.order[i];
+                     var paramId= "__addonsSettingsValue"+addonName+"_"+paramName;
+                     var param= settings.exports[paramName];
+                     html+="<tr><td>"+param.title+"</td><td>";
+                     if (param.type=='text') {
+                         html+="<INPUT type='text' value='"+escapeHtml(param.value)+"' name='"+paramId+"' >";
+                     } else if (param.type=='checkbox') {
+                         html+="<INPUT type='checkbox' name='"+paramId+"' ";
+                         if (param.value!='0' && param.value!=0) html+="checked ";
+                         html+=">";
+                     } else if (param.type=='radio'){
+                         for (var j in param.options) {
+                             html+="<LABEL><INPUT type='radio' value='"+escapeHtml(j)+"' name='"+paramId+"' ";
+                             if (j==param.value) html+="checked ";
+                             html+=">"+param.options[j]+"</LABEL>";
+                         }
+                     } else if (param.type=='select') {
+                         html+="<SELECT name='"+paramId+"' value='"+escapeHtml(param.value)+"'>";
+                         for (var j in param.options) {
+                             html+="<OPTION value='"+escapeHtml(j)+"'>"+param.options[j]+"</OPTION>";
+                         };
+                         html+="</SELECT>";
+                     };
+                     html+="</td></tr>";
+                 };
+                 html+="</table>";
+             };
+        };
+        $("#__addonspage"+addonName).html(html);
+    }
+    $("#__addonspage"+addonName).css("display", "block");
+};
+function __addonsAddCSS (csstext) {
+    var head = document.getElementsByTagName('head')[0]; 
+    var newCss = document.createElement('style'); 
+    newCss.type = "text/css"; 
+    newCss.innerHTML = csstext; 
+    head.appendChild(newCss); 
+} 
+
+var __addonsSettings= new (function() {
+    try {
+        this.settings= JSON.parse( localStorage['__addonsSettings'] );
+    } catch(e) {
+        console.log(e);
+        this.settings= {};
+        localStorage['__addonsSettings']= JSON.stringify(this.settings);
+    };
+    
+    this.get= function (addonName) {
+         if (this.settings[addonName] != undefined ) {
+              return this.settings[addonName];
+         } else {
+              return null;
+         }
+    };
+    
+    this.set= function (addonName, settings) {
+        this.settings[addonName]= settings;
+        localStorage['__addonsSettings']= JSON.stringify(this.settings);
+    };
+    
+    this.getUpdatedSettings= function( addonName, defaultSettings ) { // сличает старые настройки с новыми (дефольтными) и возвращает обновленные  (только export)
+         if (this.settings[addonName] != undefined ) {
+              var oldSettings= this.settings[addonName]
+              var newExports= {};
+              var updated= false; // если что-то изменилось, то нужно сохранить
+              for (var i in defaultSettings.exports) {
+                  if (oldSettings.exports[i] == undefined) { // если такой настройки нет в старой (новая настройка)
+                      newExports[i]= defaultSettings.exports[i];
+                      updated= true;
+                  } else {
+                      if (defaultSettings.exports[i].type   !=oldSettings.exports[i].type ||
+                          defaultSettings.exports[i].title  !=oldSettings.exports[i].title ||
+                          defaultSettings.exports[i].options!=oldSettings.exports[i].options) {
+                              updated=true; // сравнили все, кроме value и есть несовпадения
+                      };
+                      newExports[i]= defaultSettings.exports[i];
+                      newExports[i].value= oldSettings.exports[i].value; 
+                  }
+              }
+              for (var i in oldSettings.exports) {
+                  if (newExports[i]==undefined) updated= true; // ключи, которых нет в новых дефольтных
+              };
+              if (oldSettings.title!= defaultSettings.title || oldSettings.order!= defaultSettings.order || oldSettings.description!= defaultSettings.description) {
+                  oldSettings.title= defaultSettings.title;
+                  oldSettings.order= defaultSettings.order;
+                  oldSettings.description= defaultSettings.description;
+                  updated=true;
+              };
+              oldSettings.exports= newExports;
+              if (updated) this.set( addonName, oldSettings);
+              console.log(oldSettings);
+              return oldSettings;
+         } else {
+              this.set(addonName, defaultSettings);
+              return defaultSettings;
+         }
+    };
+})();
+
 function __addonLoader() {
     __addonsStarted= true;
-    var div1= document.createElement('div');
-    div1.style.display="none";
-    div1.id= "__div_options";
-    var htmlDiv="<TABLE>";
-    for (var i in __addons) {
-        htmlDiv+="<TR><TD><INPUT type='checkbox' onclick='__toogleEnabled(\""+__addons[i]+"\", this.checked);' ";
-        if (localStorage["__Enable__"+__addons[i]]=="yes") htmlDiv+="checked ";
-        htmlDiv+="></TD><TD>"+__addons[i].replace("__", "")+"</TD></TR>";
-    };
-    htmlDiv+="</TABLE>";
-    //console.log(htmlDiv);
-    div1.innerHTML=htmlDiv;
+    var css= "div.addons-settings {position: absolute; display:block; width:50%; height:50%; background-color: #EEEEEE; border:1px solid blue; max-width:51%; max-height:51%;} div.addons-overflow {overflow-y:auto; oferflow-x:hidden; height:90%; max-height:91%}; .addons-leftpanel {}; div.addons-itemlist {margin-left:0px; padding-left:0px; width:100%} .cursor-pointer {cursor:pointer} .addons-page {display:none}";
+    __addonsAddCSS(css);
+    
     var img=document.createElement('img');
     img.src="[DEPLOY:image64]images/icon.png[/DEPLOY]";
+    img.className='cursor-pointer';
     img.style.width=img.style.height="16px";
     img.id= "__imageIcon";
     img.onclick= function(e) {
-        if (div1.style.display=="none") {
-            div1.style.display="block";
-        } else {
+        if (div1.style.display=="block") {
             div1.style.display="none";
+        } else {
+            div1.style.display="block";
         };
     };
     $(img).insertBefore($("#searchBar div a")[0]);
-    $(div1).insertBefore(img);
+    var imgRect= img.getBoundingClientRect();
+    
+    var div1= document.createElement("div");
+    div1.className="addons-settings";
+    div1.id= "__div_options";
+    var htmlDiv="<DIV class='addons-overflow'><TABLE><TR><TD width='35%' valign=top><DIV class='addons-leftpanel'><TABLE cellspacing=0>";
+    var htmlDiv2="";
+    for (var i in __addons) {
+        htmlDiv+="<TR class='addons-listitem' onclick='__openSettingsPage(\""+__addons[i]+"\", this);'><TD onclick='event.stopPropagation();'><INPUT type='checkbox' onclick='__toogleEnabled(\""+__addons[i]+"\", this.checked);' ";
+        if (localStorage["__Enable__"+__addons[i]]=="yes") htmlDiv+="checked ";
+        try {
+            var name= __addonsSettings.settings[__addons[i]].title;
+        } catch(e) {
+            var name= __addons[i].replace("__", "");
+        };
+        htmlDiv+="></TD><TD class='cursor-pointer'>"+name+"</TD></TR>";
+        htmlDiv2+="<DIV class='addons-page' id='__addonspage"+__addons[i]+"'></DIV>";
+    };
+    htmlDiv+="</TABLE></DIV></TD><TD width='*' valign=top>"+htmlDiv2+"</TD></TR></TABLE></DIV><BUTTON onclick='__saveAddonsSettings'>Сохранить</BUTTON>";
+    //console.log(htmlDiv);
+    div1.style.top=(imgRect.top+imgRect.height+5)+"px";
+    div1.style.left=(imgRect.left-150)+"px";
+    div1.innerHTML=htmlDiv;
+    document.body.appendChild(div1);
     for (var i in __addons) {
         if (localStorage["__Enable__"+__addons[i]]=="yes") {
             window[__addons[i]]();
