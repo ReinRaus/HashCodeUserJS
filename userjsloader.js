@@ -123,7 +123,10 @@ function __saveAddonsSettings() {
             }
         };
         $("#__addons_span_count").html(count);
-        if (count==sezn.length) location.reload();
+        if (count==sezn.length) {
+            frames[sezn[0]][1]= false; // чтобы не перезагружало бесконечно
+            location.reload();
+        };
     }, 1000, false);
 };
 function __addonsAddCSS (csstext) {
@@ -201,7 +204,10 @@ function __addonLoader() {
             var settings= JSON.parse(message.data.substring(12));
             for (var addonName in settings) {
                 if (__addonsSettings.settings[addonName]== undefined) __addonsSettings.settings[addonName]={};
-                __addonsSettings.settings[addonName].exports=settings[addonName].exports
+                __addonsSettings.settings[addonName].exports=settings[addonName].exports;
+                __addonsSettings.settings[addonName].title=settings[addonName].title;
+                __addonsSettings.settings[addonName].description=settings[addonName].description;
+                __addonsSettings.settings[addonName].order=settings[addonName].order;
             }
             __addonsSettings.set();
             message.source.postMessage("SettingsSets:"+location.hostname, '*');

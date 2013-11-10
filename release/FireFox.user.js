@@ -5,12 +5,11 @@
 // @include         http://bitcode.ru/*
 // @include         http://rootcode.ru/*
 // @include         http://*.sezn.ru/*
-// @include         http://sezn.ru/*
 // ==/UserScript==
 
 function __extension__wrapper__(){
 
-var __addons=['__autocompleteWithLinks', '__autocompleteWithSelection', '__newAnswersAndComments', '__sortBetter'];
+var __addons=['__autocompleteWithLinks', '__autocompleteWithSelection', '__collapseLongCodeBlock', '__newAnswersAndComments', '__sortBetter'];
 ﻿var __addonsStarted= false;
 
 function __toogleEnabled(name, value){
@@ -136,7 +135,10 @@ function __saveAddonsSettings() {
             }
         };
         $("#__addons_span_count").html(count);
-        if (count==sezn.length) location.reload();
+        if (count==sezn.length) {
+            frames[sezn[0]][1]= false; // чтобы не перезагружало бесконечно
+            location.reload();
+        };
     }, 1000, false);
 };
 function __addonsAddCSS (csstext) {
@@ -214,7 +216,10 @@ function __addonLoader() {
             var settings= JSON.parse(message.data.substring(12));
             for (var addonName in settings) {
                 if (__addonsSettings.settings[addonName]== undefined) __addonsSettings.settings[addonName]={};
-                __addonsSettings.settings[addonName].exports=settings[addonName].exports
+                __addonsSettings.settings[addonName].exports=settings[addonName].exports;
+                __addonsSettings.settings[addonName].title=settings[addonName].title;
+                __addonsSettings.settings[addonName].description=settings[addonName].description;
+                __addonsSettings.settings[addonName].order=settings[addonName].order;
             }
             __addonsSettings.set();
             message.source.postMessage("SettingsSets:"+location.hostname, '*');
@@ -466,6 +471,30 @@ function __autocompleteWithLinks() {
     );
 };
 
+﻿function __collapseLongCodeBlock() {
+    var defaultSettings= {
+        title: 'Сворачивание длинного кода',
+        description: 'К слишком большим участкам кода добавляется полоса прокрутки.',
+        exports: {
+            "maxheight": {"type":"text", "value":"400px", "title":"Ограничить максимальную высоту значением:"},
+            "yscroll": {"type":"checkbox", "value":"0", "title":"Добавить горизонтальную прокрутку"}
+        },
+        order: ["maxheight", "yscroll"]
+    };
+    var settings= __addonsSettings.getUpdatedSettings( arguments.callee.name, defaultSettings );
+    $code= $(".prettyprint");
+    if ($code.length>0) {
+        $code.css({
+            "height":"auto",
+            "max-height": settings.exports.maxheight.value,
+            "overflow-y":"auto"});
+        if (settings.exports.yscroll.value=="1"){
+            $code.css({
+                "word-wrap":"normal",
+                "white-space":"pre"});
+        };
+    };
+};
 // @author Yura Ivanov
 function __newAnswersAndComments() {
   var defaultSettings= {
