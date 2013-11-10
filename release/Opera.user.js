@@ -489,9 +489,7 @@ function __autocompleteWithLinks() {
             "max-height": settings.exports.maxheight.value,
             "overflow-y":"auto"});
         if (settings.exports.yscroll.value=="1"){
-            $code.css({
-                "word-wrap":"normal",
-                "white-space":"pre"});
+            $(".prettyprint code").css({"white-space": "nowrap"});
         };
     };
 };
