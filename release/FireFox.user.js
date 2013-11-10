@@ -507,7 +507,9 @@ function __newAnswersAndComments() {
   var settings= __addonsSettings.getUpdatedSettings( arguments.callee.name, defaultSettings );
   var regexURL= new RegExp("^https?://[^/]+/(?:questions|research)/.+$", "i");
   if (!regexURL.test(location.href)) return; // если не вопрос, то не работаем
-  var qid = $("a.post-vote.up").attr("href").replace('/vote/', '').replace('/up', '');
+  var $qid= $("a.post-vote.up");
+  if ($qid.length==0) return; // невозможно включиться
+  var qid = $qid.attr("href").replace('/vote/', '').replace('/up', '');
   var qopened = window.localStorage.getItem('__opened_' + qid);
   var readanswers = JSON.parse(window.localStorage.getItem('__read_answers_' + qid) || "[]");
   var nowanswers = [];
