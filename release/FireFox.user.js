@@ -259,7 +259,7 @@ function __addonLoader() {
         htmlDiv+="></TD><TD class='cursor-pointer'>"+name+"</TD></TR>";
         htmlDiv2+="<DIV class='addons-page' id='__addonspage"+__addons[i]+"'></DIV>";
     };
-    htmlDiv+="</TABLE></DIV></TD><TD width='*' valign=top>"+htmlDiv2+"</TD></TR></TABLE></DIV><BUTTON onclick='__saveAddonsSettings()'>Сохранить</BUTTON>";
+    htmlDiv+="</TABLE></DIV></TD><TD width='*' valign=top>"+htmlDiv2+"</TD></TR></TABLE></DIV><BUTTON onclick='__saveAddonsSettings()'>Сохранить</BUTTON> <BUTTON onclick='this.parentNode.style.display=\"none\";'>Закрыть</BUTTON>";
     //console.log(htmlDiv);
     div1.style.top=(imgRect.top+imgRect.height+5)+"px";
     div1.style.left=(imgRect.left-150)+"px";
