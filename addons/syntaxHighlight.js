@@ -36,7 +36,7 @@ function __highlight_SH(){
     brush = "brush: js; html-script: true";
   } else if (tags.indexOf('php')>=0)
   {
-    brush = "brush: php; html-script: true";
+    brush = "brush: php";
   } else if (tags.indexOf('js')>=0 || tags.indexOf('javascript')>=0 || tags.indexOf('jquery')>=0)
   {
     brush = "brush: js";
