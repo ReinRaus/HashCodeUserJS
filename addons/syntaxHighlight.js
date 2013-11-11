@@ -1,4 +1,14 @@
 function __highlight_SH(){
+  var defaultSettings= {
+        title: 'Подсветка синтаксиса SyntaxHighlighter''ом',
+        description: 'Автопределение языка подсветки по тэгам вопроса\nПоддержка языков: text/plain, html+js, js, c/c++/objective-c, c#, ruby, python, php, pascal/delphi/freepascal',
+        /*exports: {
+        },
+        order: []*/
+    };
+  var settings= __addonsSettings.getUpdatedSettings( arguments.callee.name, defaultSettings );
+  var regexURL= new RegExp("^https?://[^/]+/(?:questions|research)/.+$", "i");
+  if (!regexURL.test(location.href)) return; // если не вопрос, то не работаем
   function changeStyles(rule){
     var ss = document.styleSheets[document.styleSheets.length-1];
     ss.insertRule(rule,ss.cssRules.length);
