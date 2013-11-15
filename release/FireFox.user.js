@@ -213,7 +213,7 @@ function __addonLoader() {
     if (typeof $ == 'undefined') return;
     clearInterval(__checkStartedInterval);
     __addonsStarted= true;
-    var build= parseInt("7");
+    var build= parseInt("9");
     window.addEventListener("message", function(message, url){
         if (message.data.substring(0, 12)=="SetSettings:"){
             var settings= JSON.parse(message.data.substring(12));
@@ -273,7 +273,7 @@ function __addonLoader() {
             window[__addons[i]]();
         }
     }
-};//////тествафцфцвыуа
+};//////тествафцфцвыуафываы
 
 document.addEventListener( "DOMContentLoaded", __addonLoader, false );
 var __check__Started= function(){
