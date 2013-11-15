@@ -6,7 +6,7 @@ def joinFiles():
     global addons
     result="\nvar __addons=['"+"', '".join(["__"+k[::-1].replace("sj.", "", 1)[::-1] for k in addons])+"'];\n"
     with open("userjsloader.js", "rb") as f:
-        result+= deleteBOM(f.read().decode('utf-8'))+"\n"
+        result+= deleteBOM(f.read( ).decode('utf-8'))+"\n"
     for i in addons:
         with open("./addons/"+i, "rb") as f:
             result+= deleteBOM(f.read().decode('utf-8'))+"\n"

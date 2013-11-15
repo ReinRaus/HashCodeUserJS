@@ -210,6 +210,10 @@ var __addonsSettings= new (function() {
 })();
 
 function __addonLoader() {
+    var checkUpdates= function() {
+        var lastSHA= localStorage['__lastSHAfromgitHub'];
+        // получить ша раз в час, когда пользователь откроет настройки, нарисовать плашку, что доступно обновление, и установить ша в тоже значение https://api.github.com/repos/ReinRaus/HashCodeUserJS/git/trees/master?callback=githubresponse
+    };
     __addonsStarted= true;
     window.addEventListener("message", function(message, url){
         if (message.data.substring(0, 12)=="SetSettings:"){
