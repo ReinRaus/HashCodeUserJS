@@ -55,10 +55,10 @@ function joinFiles($path, $addons) {
             global $path;
             return getDataURL($path.str_replace("/", DS, $match[1]));
         }, $result);
-    /*$result= preg_replace_callback("/\[DEPLOY:build\](.*?)\[\/DEPLOY\]/is", function($match){
+    $result= preg_replace_callback("/\[DEPLOY:build\](.*?)\[\/DEPLOY\]/is", function($match){
             global $build;
             return $build;
-        }, $result);*/
+        }, $result);
     return $result;
 };
 
