@@ -261,7 +261,7 @@ function __addonLoader() {
             window[__addons[i]]();
         }
     }
-};//////тества
+};//////тествафц
 
 document.addEventListener( "DOMContentLoaded", __addonLoader, false );
 var __check__Started= function(){
