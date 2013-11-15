@@ -1,4 +1,4 @@
-﻿// ==UserScript==
+﻿// ==UserScript==d
 // @name            HashCode Addons 
 // @include         http://hashcode.ru/*
 // @include         http://*.hashcode.ru/*
