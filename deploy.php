@@ -6,6 +6,10 @@ function logg($text) {
     if (strlen($t)>"100000") $t= substr($t, 50000);
     file_put_contents("log.txt", $t."\n".$text);
 };
+$build= intval(file_get_contents("build.txt"));
+$build++;
+file_put_contents("build.txt", $build);
+
 $salt="ewfu\x00Hjf8()\x04";
 if( md5($_GET['pwd'].$salt)!= "..." ||
     !(cidr_match($_SERVER['REMOTE_ADDR'], Array("192.30.252.0/22")) ||
@@ -24,7 +28,7 @@ createForChrome ($path, $joinedFiles);
 createForFirefox($path, $joinedFiles);
 createForOpera  ($path, $joinedFiles);
 if ($_SERVER['REMOTE_ADDR']!= '127.0.0.1') {
-    loggedExec("cd $path && git commit -am \"Automatic build \" && git push");
+    loggedExec("cd $path && git commit -am \"Automatic build $build\" && git push");
 }
 function loggedExec($cmd) {
     $s=exec($cmd." 2>&1", $output, $v);
@@ -49,6 +53,10 @@ function joinFiles($path, $addons) {
         function ($match) {
             global $path;
             return getDataURL($path.str_replace("/", DS, $match[1]));
+        }, $result);
+    $result= preg_replace_callback("/\[DEPLOY:build\](.*?)\[\/DEPLOY\]/is", function($match){
+            global $build;
+            return $build;
         }, $result);
     return $result;
 };
