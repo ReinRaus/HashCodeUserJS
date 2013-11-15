@@ -213,7 +213,7 @@ function __addonLoader() {
     if (typeof $ == 'undefined') return;
     clearInterval(__checkStartedInterval);
     __addonsStarted= true;
-    var build= parseInt("40");
+    var build= parseInt("41");
     window.addEventListener("message", function(message, url){
         if (message.data.substring(0, 12)=="SetSettings:"){
             var settings= JSON.parse(message.data.substring(12));
