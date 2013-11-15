@@ -8,7 +8,6 @@ function __autocompleteWithLinks() {
         order: []*/
     };
     var settings= __addonsSettings.getUpdatedSettings( arguments.callee.name, defaultSettings );
-    if (typeof $ != 'undefined') {
         var currentLogin= $("#searchBar a")[0].innerHTML.toLowerCase(); // логин самого участника
         if ($("#question-table").length) {
             var users = [];
@@ -78,5 +77,4 @@ function __autocompleteWithLinks() {
                         myField.focus();
                     });
         }
-    }
 };

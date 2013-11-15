@@ -198,6 +198,8 @@ var __addonsSettings= new (function() {
 })();
 
 function __addonLoader() {
+    if (typeof $ == 'undefined') return;
+    clearInterval(__checkStartedInterval);
     __addonsStarted= true;
     window.addEventListener("message", function(message, url){
         if (message.data.substring(0, 12)=="SetSettings:"){
@@ -264,5 +266,5 @@ document.addEventListener( "DOMContentLoaded", __addonLoader, false );
 var __check__Started= function(){
     if (!__addonsStarted) __addonLoader();
 };
-window.setTimeout(__check__Started, 300);
+var __checkStartedInterval= window.setInterval(__check__Started, 50);
 
