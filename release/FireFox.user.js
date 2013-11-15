@@ -1,4 +1,4 @@
-﻿// ==UserScript==вв
+﻿// ==UserScript==
 // @name            HashCode Addons 
 // @include         http://hashcode.ru/*
 // @include         http://*.hashcode.ru/*
@@ -213,7 +213,7 @@ function __addonLoader() {
     if (typeof $ == 'undefined') return;
     clearInterval(__checkStartedInterval);
     __addonsStarted= true;
-    var build= parseInt("[DEPLOY:build][/DEPLOY]");
+    var build= parseInt("2");
     window.addEventListener("message", function(message, url){
         if (message.data.substring(0, 12)=="SetSettings:"){
             var settings= JSON.parse(message.data.substring(12));
