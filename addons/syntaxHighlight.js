@@ -1,4 +1,4 @@
-﻿function __syntaxHighlight(){
+function __syntaxHighlight(){
   var defaultSettings= {
         title: 'Подсветка синтаксиса SyntaxHighlighter\'ом',
         description: 'Автопределение языка подсветки по тэгам вопроса\nПоддержка языков: text/plain, html+js, js, c/c++/objective-c, c#, ruby, python, php, pascal/delphi/freepascal',
@@ -74,7 +74,7 @@
   }
   $("pre code").each(function(i,code){
     var pre = $(code).parent();
-    $("<hashcode class='"+brush+"' style='white-space:pre;font-family:monospace'></hashcode>").html($(code).html()).insertBefore(pre);
+    $("<hashcode class='"+brush+"' style='white-space:pre;font-family:monospace'></hashcode>").html(code.innerHTML).insertBefore(pre);
     $(pre).remove();
   });
   SyntaxHighlighter.defaults['toolbar'] = false;
@@ -96,4 +96,5 @@
   });
   changeStyles("code {white-space: nowrap}");
   changeStyles(".syntaxhighlighter {width: 695px !important;overflow:auto !important;max-height:400px !important}");
+  changeStyles(".comment-text .syntaxhighlighter {width: 677px !important;overflow:auto !important;max-height:400px !important}");
 }
