@@ -213,7 +213,7 @@ function __addonLoader() {
     if (typeof $ == 'undefined') return;
     clearInterval(__checkStartedInterval);
     __addonsStarted= true;
-    var build= parseInt("11");
+    var build= parseInt("13");
     window.addEventListener("message", function(message, url){
         if (message.data.substring(0, 12)=="SetSettings:"){
             var settings= JSON.parse(message.data.substring(12));
@@ -362,7 +362,7 @@ function __autocompleteWithLinks() {
                     });
         }
 };
-function __syntaxHighlight(){
+﻿function __syntaxHighlight(){
   var defaultSettings= {
         title: 'Подсветка синтаксиса SyntaxHighlighter\'ом',
         description: 'Автопределение языка подсветки по тэгам вопроса\nПоддержка языков: text/plain, html+js, js, c/c++/objective-c, c#, ruby, python, php, pascal/delphi/freepascal',
