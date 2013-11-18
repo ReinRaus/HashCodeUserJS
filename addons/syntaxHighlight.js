@@ -1,4 +1,4 @@
-function __syntaxHighlight(){
+﻿function __syntaxHighlight(){
   var defaultSettings= {
         title: 'Подсветка синтаксиса SyntaxHighlighter\'ом',
         description: 'Автопределение языка подсветки по тэгам вопроса\nПоддержка языков: text/plain, html+js, js, c/c++/objective-c, c#, ruby, python, php, pascal/delphi/freepascal',
