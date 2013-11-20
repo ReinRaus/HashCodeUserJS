@@ -6,10 +6,11 @@
         exports: {
             scripts:{type:"text", value:"[]", title:"нет в ордер, не показываются"},
             lastOpened:{type:"text", value:0, title:"hidden"},
-            maxHighlightLength:{type:"text", value:Infinity, title:"Максимальная подсвечиваемая длина<br/><small>(в символах или Infinity)</small>"},
+            maxHighlightLength:{type:"text", value:"Infinity", title:"Максимальная подсвечиваемая длина<br/><small>(в символах или Infinity)</small>"},
+            fontSize: {type:"text", value:'14px', title:'Размер шрифта в редакторе'},
             settings:{type:"text", value:"{}", title:""}
         },
-        order: ["maxHighlightLength"]
+        order: ["maxHighlightLength", "fontSize"]
     };
     var addonName= arguments.callee.name;
     var settings= __addonsSettings.getUpdatedSettings( addonName, defaultSettings );
@@ -85,6 +86,7 @@
             maxHighlightLength: settings.exports.maxHighlightLength.value=="Infinity"?Infinity:parseInt(settings.exports.maxHighlightLength.value)
         });
         editor.display.scroller.parentNode.style.height="100%";
+        editor.display.scroller.style.fontSize= settings.fontSize;
         img.onclick();
     };
     var fixSlowLoading= function() {
@@ -138,7 +140,7 @@
     for (var i in scripts) {
         console.log('Запуск функции '+ $("#__addons_DM_selectScript option")[i].innerHTML);
         var scr= document.createElement('script');
-        scr.innerHTML=glush+"\n("+scripts[i].replace(/\}[^\}]*?$/, "})();");
+        scr.innerHTML= "("+scripts[i].replace(/\}[^\}]*?$/, "})();").replace(/^([^\{]*\{)/, "$1"+glush);
         document.getElementsByTagName('head')[0].appendChild(scr);
     };
 };
