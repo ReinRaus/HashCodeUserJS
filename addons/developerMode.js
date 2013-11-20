@@ -74,7 +74,7 @@
     linkSS.href="http://cdnjs.cloudflare.com/ajax/libs/codemirror/3.19.0/codemirror.css";
     document.getElementsByTagName('head')[0].appendChild(linkSS);
     var script1= document.createElement("script");
-    script1.src='http://cdnjs.cloudflare.com/ajax/libs/codemirror/3.19.0/mode/javascript/javascript.js';
+    script1.src='http://cdnjs.cloudflare.com/ajax/libs/codemirror/3.19.0/codemirror.js';
     document.getElementsByTagName('head')[0].appendChild(script1);
         
     var editor; // глобалим
@@ -92,7 +92,7 @@
     var fixSlowLoading= function() {
         if (typeof(CodeMirror)=="undefined") return;
         var script2= document.createElement("script");
-        script2.src='http://localhost/temp/codemirror319/mode/javascript/javascript.js';
+        script2.src='http://cdnjs.cloudflare.com/ajax/libs/codemirror/3.19.0/mode/javascript/javascript.js';
         document.getElementsByTagName('head')[0].appendChild(script2);
         window.setTimeout(initCodeMirror, 50);
         clearInterval(interval);
