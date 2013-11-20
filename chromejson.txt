@@ -1,1 +1,1 @@
-{"name":"HashCode Addons","urlRegex":"^http://((meta\\.|careers\\.|math\\.|russ\\.|admin\\.|user\\.)?hashcode|bitcode|rootcode|(games|turism|foto|hm|phys|english)?\\.sezn)\\.ru","urlExcludeRegex":"","enabled":true,"preserveDocWrite":true,"css":"","html":"","js":"","filters":[]}
+{"name":"HashCode Addons","urlRegex":"^http://((meta\\.|careers\\.|math\\.|russ\\.|admin\\.|user\\.)?hashcode|bitcode|rootcode|(games|turism|foto|hm|phys|english)?\\.sezn)\\.ru|localhost","urlExcludeRegex":"","enabled":true,"preserveDocWrite":true,"css":"","html":"","js":"","filters":[]}

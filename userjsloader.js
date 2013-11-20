@@ -162,6 +162,7 @@ var __addonsSettings= new (function() {
     this.getUpdatedSettings= function( addonName, defaultSettings ) { // сличает старые настройки с новыми (дефольтными) и возвращает обновленные  (только export)
          if (this.settings[addonName] != undefined ) {
               var oldSettings= this.settings[addonName]
+              if (oldSettings.exports== undefined) oldSettings.exports={};
               var newExports= {};
               var updated= false; // если что-то изменилось, то нужно сохранить
               for (var i in defaultSettings.exports) {
@@ -225,11 +226,7 @@ function __addonLoader() {
     img.style.width=img.style.height="16px";
     img.id= "__imageIcon";
     img.onclick= function(e) {
-        if (div1.style.display=="block") {
-            div1.style.display="none";
-        } else {
-            div1.style.display="block";
-        };
+        div1.style.display= div1.style.display=="block" ? "none":"block";
     };
     $(img).insertBefore($("#searchBar div a")[0]);
     var imgRect= img.getBoundingClientRect();
