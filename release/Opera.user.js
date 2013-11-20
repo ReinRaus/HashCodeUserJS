@@ -214,7 +214,7 @@ function __addonLoader() {
     if (typeof $ == 'undefined') return;
     clearInterval(__checkStartedInterval);
     __addonsStarted= true;
-    var build= parseInt("17");
+    var build= parseInt("19");
     window.addEventListener("message", function(message, url){
         if (message.data.substring(0, 12)=="SetSettings:"){
             var settings= JSON.parse(message.data.substring(12));
@@ -355,7 +355,7 @@ var __checkStartedInterval= window.setInterval(__check__Started, 50);
     linkSS.href="http://cdnjs.cloudflare.com/ajax/libs/codemirror/3.19.0/codemirror.css";
     document.getElementsByTagName('head')[0].appendChild(linkSS);
     var script1= document.createElement("script");
-    script1.src='http://cdnjs.cloudflare.com/ajax/libs/codemirror/3.19.0/mode/javascript/javascript.js';
+    script1.src='http://cdnjs.cloudflare.com/ajax/libs/codemirror/3.19.0/codemirror.js';
     document.getElementsByTagName('head')[0].appendChild(script1);
         
     var editor; // глобалим
@@ -373,7 +373,7 @@ var __checkStartedInterval= window.setInterval(__check__Started, 50);
     var fixSlowLoading= function() {
         if (typeof(CodeMirror)=="undefined") return;
         var script2= document.createElement("script");
-        script2.src='http://localhost/temp/codemirror319/mode/javascript/javascript.js';
+        script2.src='http://cdnjs.cloudflare.com/ajax/libs/codemirror/3.19.0/mode/javascript/javascript.js';
         document.getElementsByTagName('head')[0].appendChild(script2);
         window.setTimeout(initCodeMirror, 50);
         clearInterval(interval);
