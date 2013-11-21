@@ -1,6 +1,15 @@
 ﻿var __addonsStarted= false;
 
-
+function __toogleEnabled(name, item){
+if(localStorage["__Enable__"+name] != "yes") {
+$(item).removeClass("addon-checkbox").addClass("addon-checkbox-clicked");
+localStorage["__Enable__"+name]= "yes";
+}
+else {
+$(item).removeClass("addon-checkbox-clicked").addClass("addon-checkbox");
+localStorage["__Enable__"+name]= "no";
+}
+};
 
 function __openSettingsPage(addonName, targetItem) {
     var escapeHtml= function(text) {
