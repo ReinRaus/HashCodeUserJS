@@ -1,6 +1,15 @@
 ﻿var __addonsStarted= false;
 
-
+function __toogleEnabled(name, item){
+if(localStorage["__Enable__"+name] != "yes") {
+$(item).removeClass("addon-checkbox").addClass("addon-checkbox-clicked");
+localStorage["__Enable__"+name]= "yes";
+}
+else {
+$(item).removeClass("addon-checkbox-clicked").addClass("addon-checkbox");
+localStorage["__Enable__"+name]= "no";
+}
+};
 
 function __openSettingsPage(addonName, targetItem) {
     var escapeHtml= function(text) {
@@ -98,7 +107,7 @@ function __saveAddonsSettings() {
             frames[message.data.substring(13)][1]=true;
         }
     });
-    $("#__div_options").html("<h3>Идет сохранение настроек, это может занять некоторое время</h3><br/>Сохранено <span id='__addons_span_count'>0</span> сайтов из "+sezn.length);
+    $("#__div_options").html("<div class='addons-save-info'><h3>Идет сохранение настроек, это может занять некоторое время</h3><br/>Сохранено <span id='__addons_span_count'>0</span> сайтов из "+sezn.length + "</div>");
     for (var i=0; i<sezn.length; i++) {
         if (location.hostname!=sezn[i]){
             var frame= document.createElement("iframe");
