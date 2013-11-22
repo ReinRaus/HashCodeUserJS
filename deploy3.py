@@ -4,13 +4,13 @@ import os, re, json, sqlite3, codecs, time, base64, sys
 
 def joinFiles():
     global addons
-    result="\n"
+    result="\nvar __addons=['"+"', '".join(["__"+k[::-1].replace("sj.", "", 1)[::-1] for k in addons])+"'];\n"
     with open("userjsloader.js", "rb") as f:
         result+= deleteBOM(f.read( ).decode('utf-8'))+"\n\n__addons=[\n\n"
     for i in addons:
         with open("./addons/"+i, "rb") as f:
             result+= deleteBOM(f.read().decode('utf-8'))+",\n\n"
-    result+= "]; // end addons\n\n"
+    result+= "]; // end addons\naddonsLoader.callEventIterator('beforeInit');\n\n"
     regex= re.compile(r'\[DEPLOY:image64\](.*?)\[/DEPLOY\]', re.I)
     match= regex.search(result)
     while match:

@@ -16,11 +16,12 @@ if( md5($_GET['pwd'].$salt)!= "..." ||
     $_SERVER['REMOTE_ADDR']== '127.0.0.1') ) die("Not access");
 $payload= json_decode($_POST['payload']);
 if ($payload->head_commit->author->name=="www-data") die(); // чтобы не зацикливало
+$branch= preg_replace("/^.*?([^\/]++)$/", "$1", $payload->ref);
 if ($_SERVER['REMOTE_ADDR']== '127.0.0.1') {
     $path= "c:/Users/ReinRaus/git/HashCodeUserJS/";
 } else {
     $path= "/home/git/repositories/apachereps/HashCodeUserJS/";
-    loggedExec("cd $path && git pull");
+    loggedExec("cd $path && git pull && git checkout $branch");
 };
 $path= str_replace("/", DS, $path);
 $addons= getAddons($path);
@@ -29,7 +30,12 @@ createForChrome ($path, $joinedFiles);
 createForFirefox($path, $joinedFiles);
 createForOpera  ($path, $joinedFiles);
 if ($_SERVER['REMOTE_ADDR']!= '127.0.0.1') {
-    loggedExec("cd $path && git commit -am \"Automatic build $build\" && git push");
+    loggedExec("cd $path && git commit -am \"Automatic build $build\"");
+    if ($branch!="master") {
+        loggedExec("cd $path && git push origin $branch && git checkout master && git branch -D $branch");
+    } else {
+        loggedExec("cd $path && git push");
+    }
 }
 function loggedExec($cmd) {
     $s=exec($cmd." 2>&1", $output, $v);
@@ -46,10 +52,16 @@ function joinFiles($path, $addons) {
     $DS= DS;
     $__addons= array_map(function($text){return preg_replace("/\\.js$/i", "", "__".$text);}, $addons);
     $result="\nvar __addons=['".implode("', '", $__addons)."'];\n";
-    $result.= file_get_contents($path."userjsloader.js")."\n";
+    $result.= file_get_contents($path."userjsloader.js")."\n\n__addons=[\n\n";
     foreach ($addons as $k=>$v) {
-        $result.= file_get_contents("$path${DS}addons$DS$v")."\n";
+        $content= file_get_contents("$path${DS}addons$DS$v");
+        if (mb_detect_encoding($content)=='UTF-8' && substr($content, 0, 3)!="\xef\xbb\xbf") {
+            $content="\xef\xbb\xbf".$content; // + BOM
+            file_put_contents("$path${DS}addons$DS$v", $content);
+        }
+        $result.= $content.",\n\n";
     };
+    $result.= "]; // end addons\naddonsLoader.callEventIterator('beforeInit');\n\n";
     $result= preg_replace_callback("/\[DEPLOY:image64\](.*?)\[\/DEPLOY\]/is", 
         function ($match) {
             global $path;

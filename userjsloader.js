@@ -8,20 +8,15 @@
         if (!this.started) addonsLoader.init();
     },
     storage: null,
+    storageOnlyExports: null,
     /** Можно ли отложить сохранение storage, или выполнять немедленно */
     delayedSave: true,
+    /** Это сделано из-за того, что при инициализации каждый аддон может изменить настройки и запросить их сохранение. Чтобы много раз не сериализовать одно и тоже при инициализации сохранение откладывается, а в конце инициализации все сразу сохраняется. Во всех остальных случаях предпочтительно сразу сохранять настройки. */
     commitStorage: function() {
         this.delayedSave= false;
         this.saveStorage();
     },
-    
-    init: function() {
-        if (typeof($)=="undefined" || this==document) return;
-        window.clearInterval(this.interval);
-        this.started= true;
-        for (var i in __addons) {
-            this.addons[__addons[i].name]= __addons[i];
-        };
+    initStorage: function() {
         try {
             this.storage= JSON.parse( localStorage['__addonsSettings'] );
             if ( typeof(this.storage.enabledAddons)=="undefined" || typeof(this.storage.addonsSettings)=="undefined" ) throws();
@@ -30,9 +25,21 @@
             this.storage= { enabledAddons:{}, addonsSettings:{} };
             this.saveStorage();
         };
-        var build= parseInt("[DEPLOY:build][/DEPLOY]");
+    },
+    
+    init: function() {
+        if (typeof($)=="undefined") return;
+        window.clearInterval(this.interval);
+        this.started= true;
+        for (var i in __addons) {
+            __addons[i].saveSettings= this.saveAddonSettings; // TODO нужно наследование, а не это
+            this.addons[__addons[i].name]= __addons[i]; // TODO реализовать это в деплое. Читать name и сразу формировать addons, __addons убрать вовсе
+        };
+        var build= parseInt("[DEPLOY:build][/DEPLOY]"); // версия вставляется сбощиком
         window.addEventListener("message", this.setSettingsListener, false);
         this.API.addCSS(this.getCssByDomain(location.hostname));
+        
+        this.callEventIterator("beforeDraw");
         
         var img_div = document.createElement('div');
         img_div.className = "img-bl";
@@ -67,7 +74,7 @@
 
         for (var i in __addons) {
             htmlDiv += "<DIV class='addons-listitem' onclick='window.addonsLoader.openSettingsPage(\"" + __addons[i].name + "\", this);'><SPAN class='addon-desc-ico'>?</SPAN><DIV class='addon-name'><SPAN>" + __addons[i].title + "</SPAN></DIV>";
-            htmlDiv += "<DIV id=\"" + __addons[i].name + "\" class='addon-checkbox'  onclick='event.stopPropagation();__toogleEnabled(\"" + __addons[i].name + "\", this);' style='background: \"" + img_src + "\"'></DIV></DIV>";
+            htmlDiv += "<DIV id=\"" + __addons[i].name + "\" class='addon-checkbox'  onclick='event.stopPropagation();window.addonsLoader.toogleAddonEnabled(\"" + __addons[i].name + "\", this);' style='background: \"" + img_src + "\"'></DIV></DIV>";
             htmlDiv2 += "<DIV class='addons-desc-bl' id='__addonspage" + __addons[i].name + "'></DIV>";
         };
         htmlDiv += "</DIV><DIV>" + htmlDiv2 + "</DIV><DIV class='addons-but-save' onclick='window.addonsLoader.migrateStorageToSezn()'>Сохранить</DIV> <DIV class='addons-but-close' onclick='this.parentNode.style.display=\"none\";$(\".img-bl-clicked\").removeClass(\"img-bl-clicked\").addClass(\"img-bl\");$(\".addons-settings-img-clicked\").removeClass(\"addons-settings-img-clicked\").addClass(\"addons-settings-img\");'>Закрыть</DIV>";
@@ -75,6 +82,9 @@
         div1.style.left = ((imgRect.left + (window.pageXOffset || document.body.scrollLeft) - (document.body.clientLeft || 0)) - 532) + "px";
         div1.innerHTML = htmlDiv;
         img_div.appendChild(div1);
+        
+        this.callEventIterator("afterDraw");
+        
         for (var i in __addons) {
             $('#' + __addons[i].name + '').css("background", img_src);
             if (this.storage.enabledAddons[__addons[i].name] == "yes") {
@@ -83,6 +93,8 @@
             } else $('#' + __addons[i].name + '').removeClass("addon-checkbox-clicked").addClass("addon-checkbox");
         }
         this.commitStorage();
+        
+        this.callEventIterator("afterInit");
     },
     
     /** Создает уникальные имена для настроек. Так как эта функция будет присвоена объекту-аддону, то this это ссылка на объект-аддон. */
@@ -92,42 +104,39 @@
     
     /** Отрисовщик блока настроек по-умолчанию, возвращает HTML блока настроек, получает уже имеющийся HTML. Так как эта функция будет присвоена объекту-аддону, то this это ссылка на объект-аддон. */
     defaultDrawer: function(html) {
+    console.log(this);
         var API= window.addonsLoader.API;
-        if (typeof(this.settings)=="undefined") {
-             html+= "<div onclick='window.addonsLoader.clearClicked();' class='addons-desc-ex'>x</div>Настройки отсутствуют";
-        } else {
-             if (typeof(this.settings.title)=="undefined") html+="<h3>"+this.settings.title+"</h3>";
-             if (typeof(this.settings.description)=="undefined") html+="<div class='addons-description'>"+this.settings.description+"</div>";
-             if (typeof(this.settings.exports)=="undefined"){
-                 for (var i=0; i<this.settings.exports.length; i++) {
-                     var param= this.settings.exports[i];
-                     var paramId= this.namesResolver(param.name);
-                     var paramValue= this.settings[param.name];
-                     html+="<div><div>"+param.title+"</div><div>";
-                     if (param.type=='text') {
-                         html+="<INPUT type='text' value='"+API.escapeHtml(paramValue)+"' name='"+paramId+"' >";
-                     } else if (param.type=='checkbox') {
-                         html+="<INPUT type='checkbox' name='"+paramId+"' ";
-                         if (paramValue!='0' && paramValue!=0) html+="checked ";
-                         html+=">";
-                     } else if (param.type=='radio'){
-                         for (var j in param.options) {
-                             html+="<LABEL><INPUT type='radio' value='"+escapeHtml(j)+"' name='"+paramId+"' ";
-                             if (j==paramValue) html+="checked ";
-                             html+=">"+param.options[j]+"</LABEL>";
-                         }
-                     } else if (param.type=='select') {
-                         html+="<SELECT name='"+paramId+"' value='"+escapeHtml(paramValue)+"'>";
-                         for (var j in param.options) {
-                             html+="<OPTION value='"+escapeHtml(j)+"' ";
-                             if (j==paramValue) html+= "selected ";
-                             html+=">"+param.options[j]+"</OPTION>";
-                         };
-                         html+="</SELECT>";
-                     };
-                     html+="</div></div>";
-                 };
-             };
+        if (typeof(this.title)!="undefined") html+="<h3>"+this.title+"</h3>";
+        if (typeof(this.description)!="undefined") html+="<div class='addons-description'>"+this.description+"</div>";
+        if (typeof(this.exports)!="undefined"){
+            for (var i=0; i<this.exports.length; i++) {
+                var param= this.exports[i];
+                var paramId= this.namesResolver(param.name);
+                var paramValue= this.settings[param.name];
+                html+="<div><div>"+param.title+"</div><div>";
+                if (param.type=='text') {
+                    html+="<INPUT type='text' value='"+API.escapeHtml(paramValue)+"' name='"+paramId+"' >";
+                } else if (param.type=='checkbox') {
+                    html+="<INPUT type='checkbox' name='"+paramId+"' ";
+                    if (paramValue!='0' && paramValue!=0) html+="checked ";
+                    html+=">";
+                } else if (param.type=='radio'){
+                    for (var j in param.options) {
+                        html+="<LABEL><INPUT type='radio' value='"+escapeHtml(j)+"' name='"+paramId+"' ";
+                        if (j==paramValue) html+="checked ";
+                        html+=">"+param.options[j]+"</LABEL>";
+                    }
+                } else if (param.type=='select') {
+                    html+="<SELECT name='"+paramId+"' value='"+escapeHtml(paramValue)+"'>";
+                    for (var j in param.options) {
+                        html+="<OPTION value='"+escapeHtml(j)+"' ";
+                        if (j==paramValue) html+= "selected ";
+                        html+=">"+param.options[j]+"</OPTION>";
+                    };
+                    html+="</SELECT>";
+                };
+                html+="</div></div>";
+            };
         };
         return html;
     },
@@ -139,12 +148,12 @@
         targetItem.id='prev-selected';
         $(".addons-desc-bl").css("display", "none");
         if ($("#__addonspage"+addonName).html()=="") {
-            console.log(this); // TODO
             if (typeof(this.addons[addonName].namesResolver)!="function") this.addons[addonName].namesResolver= this.namesResolver;
             if (typeof(this.addons[addonName].drawer)!="function") this.addons[addonName].drawer= this.defaultDrawer;
             $("#__addonspage"+addonName).html(
-                this.addons[addonName].drawer("<div onclick='__clearClicked();' class='addons-desc-ex'>x</div>") );
+                this.addons[addonName].drawer("<div onclick='window.addonsLoader.clearClicked();' class='addons-desc-ex'>x</div>") );
         };
+        $("#__addonspage"+addonName).css("display", "block");
     },
     
     /** Сохраняет storage, если нельзя отложить (микрооптимизация) */
@@ -161,8 +170,13 @@
     /** слушает когда придет сообщение установить настройки (используется в iframe для миграции) */
     setSettingsListener: function(message, url){
         if (message.data.substring(0, 12)=="SetSettings:"){
-            this.storage= JSON.parse(message.data.substring(12));
-            this.saveStorage();
+            var storageOnlyExports= JSON.parse(message.data.substring(12));
+            for (var i in storageOnlyExports){
+                for (var j in storageOnlyExports[i]) {
+                    this.storage[i][j]= storageOnlyExports[i][j];
+                };
+            };
+            this.commitStorage();
             message.source.postMessage("SettingsSets:"+location.hostname, '*');
         }
     },
@@ -170,13 +184,39 @@
     sezn: 'hashcode.ru math.hashcode.ru careers.hashcode.ru russ.hashcode.ru games.sezn.ru turism.sezn.ru foto.sezn.ru hm.sezn.ru meta.hashcode.ru admin.hashcode.ru user.hashcode.ru phys.sezn.ru english.sezn.ru'.split(' '),
     
     migrateStorageToSezn: function() {
+        this.storageOnlyExports={};
+        for (var i in this.addons) {
+            this.storageOnlyExports[i]= {};
+            for (var setting in this.addons[i].exports) {
+                var resolvedName= this.addons[i].namesResolver(setting.name);
+                var inputs= document.getElementsByName(resolvedName);
+                if (inputs.length==0) continue;
+                if ( setting.type=="text" || setting.type=="textarea" || setting.type=="select" ) {
+                    var value= inputs[0].value;
+                } else if ( setting.type=="checkbox") {
+                    var value= inputs[0].checked ? '1':'0';
+                } else if ( setting.type=="radio") {
+                    for (var j=0; j<params.length; j++) {
+                        if (inputs[j].checked) {
+                            var value= params[j].value;
+                            break;
+                        }
+                    }
+                } else {
+                    var value= this.storage[this.addons[i].name][setting.name];
+                }
+                this.storageOnlyExports[this.addons[i].name][setting.name]= value;
+            };
+        };
+        console.log(this.storageOnlyExports);
+        this.commitStorage();
         var frames={};
         window.addEventListener("message", function(message, url){
             if (message.data.substring(0, 13)=="SettingsSets:"){
                 frames[message.data.substring(13)][1]=true;
             }
         });
-        $("#__div_options").html("<h3>Идет сохранение настроек, это может занять некоторое время</h3><br/>Сохранено <span id='__addons_span_count'>0</span> сайтов из "+sezn.length);
+        $("#__div_options").html("<h3>Идет сохранение настроек, это может занять некоторое время</h3><br/>Сохранено <span id='__addons_span_count'>0</span> сайтов из "+this.sezn.length);
         for (var i=0; i<this.sezn.length; i++) {
             if (location.hostname!=this.sezn[i]){
                 var frame= document.createElement("iframe");
@@ -184,8 +224,7 @@
                 frame.onload= function(){
                     var iframe=this;
                     window.setTimeout(function(){
-                            console.log(this.storage); // TODO проверить, удалить
-                            iframe.contentWindow.postMessage("SetSettings:"+JSON.stringify(this.storage), "*");
+                            iframe.contentWindow.postMessage("SetSettings:"+JSON.stringify(window.addonsLoader.storageOnlyExports), "*");
                         }, 1500, false);
                 };
                 frame.src='http://'+this.sezn[i]+"/about/";
@@ -197,13 +236,13 @@
         };
         var framesChecker= function(){
             var count=0;
-            for (var i=0; i<this.sezn.length; i++) {
-                if (frames[this.sezn[i]][1]) {
+            for (var i=0; i<window.addonsLoader.sezn.length; i++) {
+                if (frames[window.addonsLoader.sezn[i]][1]) {
                     count++;
                 }
             };
             $("#__addons_span_count").html(count);
-            if (count==this.sezn.length) {
+            if (count==window.addonsLoader.sezn.length) {
                 window.clearInterval(intervalFramesCheck);
                 location.reload();
             };
@@ -215,8 +254,19 @@
         $(".addons-desc-bl").css("display", "none");
         $("#prev-selected").removeClass("addons-listitem-clicked").addClass("addons-listitem").removeAttr("id");
     },
+    toogleAddonEnabled: function(addonName, targetNode){
+        this.storage.enabledAddons[addonName]= this.storage.enabledAddons[addonName]=="yes" ? "no":"yes";
+        this.saveStorage();
+    },
+    
+    callEventIterator: function(nameEvent) {
+        for (var i in __addons) {
+            if ( typeof(__addons[i][nameEvent])=="function") __addons[i][nameEvent]();
+        }
+    },
     
     getCssByDomain: function (domain) {
+        if (domain=="localhost") domain= "meta.hashcode.ru";
         var css = ".top_nav{float:left;width:680px}.img-bl,.img-bl-clicked{float:left;overflow:hidden;height:16px;width:16px;margin-left:9px;border:2px solid #F5F5F5;cursor:pointer;}.img-bl-clicked{height:18px;border-radius:10px 0px 0px 0px;}.addons-settings-img,.addons-settings-img-clicked{width:16px;height:18px;cursor:pointer;}.addons-settings{display:none;position:absolute;z-index:99;width:546px;height:268px;border-radius:10px 0px 0px 0px }.addons-overflow{overflow-y:auto;height:232px;margin-top:5px;}.addons-listitem,.addons-listitem-clicked{height:20px;width:500px;margin-top:6px;}.addons-listitem-clicked .addon-name span{color:white}.addon-checkbox,.addon-checkbox:hover{float:right; height:20px;width:20px;cursor:pointer;background-color:transparent} .addon-checkbox-clicked,.addon-checkbox-clicked:hover{float:right;height:20px;width:20px;cursor:pointer;background-color:transparent}.addon-name{float:left;height:20px;width:350px;word-wrap:break-word;background-color:transparent;text-align:left}.addon-name span{cursor:pointer}.addon-desc-ico{float:left;width:13px;margin-right:5px;text-align:center;border-radius:20px;color:#fff;font:bold 12px Arial;cursor:pointer}.addons-desc-bl{width:300px;padding:5px;word-wrap:break-word;position:absolute;top:0;left:548px;border-radius: 0px 10px 10px 0px;text-align:left;}.addons-desc-ex{font-weight: bold;float:right;color:red;cursor:pointer;}.addons-but-save,.addons-but-save:hover{float:left;width:70px;margin-top:10px;text-align:center;color:#333333;cursor:pointer;}.addons-but-save:hover{color:#000;}.addons-but-close,.addons-but-close:hover{float:left;width:60px;margin-left:10px;margin-top:10px;text-align:center;color:#333333;cursor:pointer;}.addons-but-close:hover{color:#000;}.addons-save-info{text-align:center;padding-top:10px;}.addons-save-info h3{padding-bottom:10px}";
         switch (domain) {
             case this.sezn[0]:
@@ -277,6 +327,7 @@
         } 
     }
 }
+addonsLoader.initStorage();
 
-document.addEventListener( "DOMContentLoaded", addonsLoader.init, false );
+document.addEventListener( "DOMContentLoaded", addonsLoader.checkStarted, false );
 addonsLoader.interval= window.setInterval(addonsLoader.checkStarted, 50);
