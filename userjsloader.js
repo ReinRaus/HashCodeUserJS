@@ -42,7 +42,7 @@
             console.log(i, addonsSettings[__addons[i].name], __addons[i].name);
         }
     },
-    
+
     init: function() {
         if (typeof($)=="undefined") return;
         window.clearInterval(this.interval);
@@ -56,9 +56,9 @@
         var build= parseInt("[DEPLOY:build][/DEPLOY]"); // версия вставляется сбощиком
         window.addEventListener("message", this.setSettingsListener, false);
         this.API.addCSS(this.getCssByDomain(location.hostname));
-        
+
         this.callEventIterator("beforeDraw");
-        
+
         var img_div = document.createElement('div');
         img_div.className = "img-bl";
         var img = document.createElement('div');
@@ -98,9 +98,9 @@
         div1.style.left = ((imgRect.left + (window.pageXOffset || document.body.scrollLeft) - (document.body.clientLeft || 0)) - 532) + "px";
         div1.innerHTML = htmlDiv;
         img_div.appendChild(div1);
-        
+
         this.callEventIterator("afterDraw");
-        
+
         for (var i in __addons) {
             $('#' + __addons[i].name + '').css("background", img_src);
             if (this.storage.enabledAddons[__addons[i].name] == "yes") {
@@ -109,15 +109,15 @@
             } else $('#' + __addons[i].name + '').removeClass("addon-checkbox-clicked").addClass("addon-checkbox");
         }
         this.commitStorage();
-        
+
         this.callEventIterator("afterInit");
     },
-    
+
     /** Создает уникальные имена для настроек. Так как эта функция будет присвоена объекту-аддону, то this это ссылка на объект-аддон. */
     namesResolver: function(name) {
             return this.name+"_setting_"+name;
     },
-    
+
     /** Отрисовщик блока настроек по-умолчанию, возвращает HTML блока настроек, получает уже имеющийся HTML. Так как эта функция будет присвоена объекту-аддону, то this это ссылка на объект-аддон. */
     defaultDrawer: function(html) {
         var API= window.addonsLoader.API;
@@ -157,7 +157,7 @@
         };
         return html;
     },
-    
+
     /** Показывает страницу настроек аддона. Если страница пуста вызывает отрисовщик, если отрисовщика нет, то назначает отрисовщик по-умолчанию. */
     openSettingsPage: function(addonName, targetItem) {
         $("#prev-selected").removeClass("addons-listitem-clicked").addClass("addons-listitem").removeAttr("id");
@@ -170,7 +170,7 @@
         };
         $("#__addonspage"+addonName).css("display", "block");
     },
-    
+
     /** Сохраняет storage, если нельзя отложить (микрооптимизация) */
     saveStorage: function() {
         if (!this.delayedSave) {
@@ -195,9 +195,9 @@
             message.source.postMessage("SettingsSets:"+location.hostname, '*');
         }
     },
-    
+
     sezn: 'hashcode.ru math.hashcode.ru careers.hashcode.ru russ.hashcode.ru games.sezn.ru turism.sezn.ru foto.sezn.ru hm.sezn.ru meta.hashcode.ru admin.hashcode.ru user.hashcode.ru phys.sezn.ru english.sezn.ru'.split(' '),
-    
+
     migrateStorageToSezn: function() {
         this.storageOnlyExports={};
         for (var i in this.addons) {
@@ -266,7 +266,7 @@
         };
         var intervalFramesCheck= window.setInterval(framesChecker, 1000, false);
     },
-    
+
     clearClicked: function() {
         $(".addons-desc-bl").css("display", "none");
         $("#prev-selected").removeClass("addons-listitem-clicked").addClass("addons-listitem").removeAttr("id");
@@ -280,13 +280,13 @@
         }
         this.saveStorage();
     },
-    
+
     callEventIterator: function(nameEvent) {
         for (var i in __addons) {
             if ( typeof(__addons[i][nameEvent])=="function") __addons[i][nameEvent]();
         }
     },
-    
+
     getCssByDomain: function (domain) {
         if (domain=="localhost") domain= "meta.hashcode.ru";
         var css = ".top_nav{float:left;width:680px}.img-bl,.img-bl-clicked{float:left;overflow:hidden;height:16px;width:16px;margin-left:9px;border:2px solid #F5F5F5;cursor:pointer;}.img-bl-clicked{height:18px;border-radius:10px 0px 0px 0px;}.addons-settings-img,.addons-settings-img-clicked{width:16px;height:18px;cursor:pointer;}.addons-settings{display:none;position:absolute;z-index:99;width:546px;height:268px;border-radius:10px 0px 0px 0px }.addons-overflow{overflow-y:auto;height:232px;margin-top:5px;}.addons-listitem,.addons-listitem-clicked{height:20px;width:500px;margin-top:6px;}.addons-listitem-clicked .addon-name span{color:white}.addon-checkbox,.addon-checkbox:hover{float:right; height:20px;width:20px;cursor:pointer;background-color:transparent} .addon-checkbox-clicked,.addon-checkbox-clicked:hover{float:right;height:20px;width:20px;cursor:pointer;background-color:transparent}.addon-name{float:left;height:20px;width:350px;word-wrap:break-word;background-color:transparent;text-align:left}.addon-name span{cursor:pointer}.addon-desc-ico{float:left;width:13px;margin-right:5px;text-align:center;border-radius:20px;color:#fff;font:bold 12px Arial;cursor:pointer}.addons-desc-bl{width:300px;padding:5px;word-wrap:break-word;position:absolute;top:0;left:548px;border-radius: 0px 10px 10px 0px;text-align:left;}.addons-desc-ex{font-weight: bold;float:right;color:red;cursor:pointer;}.addons-but-save,.addons-but-save:hover{float:left;width:70px;margin-top:10px;text-align:center;color:#333333;cursor:pointer;}.addons-but-save:hover{color:#000;}.addons-but-close,.addons-but-close:hover{float:left;width:60px;margin-left:10px;margin-top:10px;text-align:center;color:#333333;cursor:pointer;}.addons-but-close:hover{color:#000;}.addons-save-info{text-align:center;padding-top:10px;}.addons-save-info h3{padding-bottom:10px}";
@@ -330,7 +330,7 @@
         }
         return css;
     },
-    
+
     API: {
         escapeHtml: function(text) {
             return text
@@ -341,11 +341,19 @@
                 .replace(/'/g, "&#039;");
         },
         addCSS: function(csstext) {
-            var head = document.getElementsByTagName('head')[0]; 
-            var newCss = document.createElement('style'); 
-            newCss.type = "text/css"; 
-            newCss.innerHTML = csstext; 
-            head.appendChild(newCss); 
+            var head = document.getElementsByTagName('head')[0];
+            var newCss = document.createElement('style');
+            newCss.type = "text/css";
+            newCss.innerHTML = csstext;
+            head.appendChild(newCss);
+        },
+        addStyleSheet: function(url) {
+            var head = document.getElementsByTagName('head')[0];
+            var link = document.createElement('link');
+            link.href = url;
+            link.rel = "stylesheet";
+            link.type = "text/css";
+            head.appendChild(link);
         },
         arrayUnique: function(a) { // оставляет в массиве только уникальные значения
             return a.reduce(function(p, c) {
