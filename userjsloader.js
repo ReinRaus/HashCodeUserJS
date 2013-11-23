@@ -283,7 +283,7 @@
 
     callEventIterator: function(nameEvent) {
         for (var i in __addons) {
-            if ( typeof(__addons[i][nameEvent])=="function") __addons[i][nameEvent]();
+            if ( typeof(__addons[i][nameEvent])=="function" && this.storage.enabledAddons[__addons.name]=="yes") __addons[i][nameEvent]();
         }
     },
 
