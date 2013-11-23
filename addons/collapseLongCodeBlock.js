@@ -11,15 +11,9 @@
         {name: "yscroll", type: "checkbox", title: "Добавить горизонтальную прокрутку"}
     ],
     run: function() {
-        $code= $(".prettyprint");
-        if ($code.length>0) {
-            $code.css({
-                "height":"auto",
-                "max-height": this.settings.maxheight,
-                "overflow-y":"auto"});
-            if (this.settings.yscroll=="1"){
-                $(".prettyprint code").css({"white-space": "nowrap"});
-            }
+        window.addonsLoader.API.addCSS(".prettyprint , .syntaxhighlighter {height:auto !important;max-height: "+parseInt(this.settings.maxheight)+"px !important;overflow-y:auto !important}");
+        if (this.settings.yscroll=="1"){
+            window.addonsLoader.API.addCSS(".prettyprint code {white-space: nowrap}");
         }
     }
 }
