@@ -25,6 +25,20 @@
             this.storage= { enabledAddons:{}, addonsSettings:{} };
             this.saveStorage();
         };
+        var addonsSettings= this.storage.addonsSettings;
+        for (var i in __addons) {
+            if (typeof(addonsSettings[__addons[i].name])=="undefined") {
+                addonsSettings[__addons[i].name]= {};
+            }
+            for (var j in addonsSettings[__addons[i].name]) {
+                __addons[i].settings[j]= addonsSettings[__addons[i].name][j]; // переносим сохраненные настройки в аддон
+            }
+            for (var j in __addons[i].settings) {
+                if (typeof(addonsSettings[__addons[i].name][j])=="undefined") {
+                    addonsSettings[__addons[i].name][j]= __addons[i].settings[j]; // переносим значения по-умолчанию в сохраненные настройки
+                }
+            }
+        }
     },
     
     init: function() {
@@ -32,8 +46,10 @@
         window.clearInterval(this.interval);
         this.started= true;
         for (var i in __addons) {
-            __addons[i].saveSettings= this.saveAddonSettings; // TODO нужно наследование, а не это
             this.addons[__addons[i].name]= __addons[i]; // TODO реализовать это в деплое. Читать name и сразу формировать addons, __addons убрать вовсе
+            __addons[i].saveSettings= this.saveAddonSettings; // TODO нужно наследование, а не это
+            if (typeof(this.addons[__addons[i].name].namesResolver)!="function") this.addons[__addons[i].name].namesResolver= this.namesResolver;
+            if (typeof(this.addons[__addons[i].name].drawer)!="function") this.addons[__addons[i].name].drawer= this.defaultDrawer;
         };
         var build= parseInt("[DEPLOY:build][/DEPLOY]"); // версия вставляется сбощиком
         window.addEventListener("message", this.setSettingsListener, false);
@@ -104,7 +120,6 @@
     
     /** Отрисовщик блока настроек по-умолчанию, возвращает HTML блока настроек, получает уже имеющийся HTML. Так как эта функция будет присвоена объекту-аддону, то this это ссылка на объект-аддон. */
     defaultDrawer: function(html) {
-    console.log(this);
         var API= window.addonsLoader.API;
         if (typeof(this.title)!="undefined") html+="<h3>"+this.title+"</h3>";
         if (typeof(this.description)!="undefined") html+="<div class='addons-description'>"+this.description+"</div>";
@@ -113,7 +128,7 @@
                 var param= this.exports[i];
                 var paramId= this.namesResolver(param.name);
                 var paramValue= this.settings[param.name];
-                html+="<div><div>"+param.title+"</div><div>";
+                if (typeof(param.title)!="undefined") html+="<div><div>"+param.title+"</div><div>";
                 if (param.type=='text') {
                     html+="<INPUT type='text' value='"+API.escapeHtml(paramValue)+"' name='"+paramId+"' >";
                 } else if (param.type=='checkbox') {
@@ -134,6 +149,8 @@
                         html+=">"+param.options[j]+"</OPTION>";
                     };
                     html+="</SELECT>";
+                } else if (param.type=='textarea') {
+                    html+="<TEXTAREA name='"+paramId+"'>"+escapeHtml(paramValue)+"</TEXTAREA>";
                 };
                 html+="</div></div>";
             };
@@ -148,8 +165,6 @@
         targetItem.id='prev-selected';
         $(".addons-desc-bl").css("display", "none");
         if ($("#__addonspage"+addonName).html()=="") {
-            if (typeof(this.addons[addonName].namesResolver)!="function") this.addons[addonName].namesResolver= this.namesResolver;
-            if (typeof(this.addons[addonName].drawer)!="function") this.addons[addonName].drawer= this.defaultDrawer;
             $("#__addonspage"+addonName).html(
                 this.addons[addonName].drawer("<div onclick='window.addonsLoader.clearClicked();' class='addons-desc-ex'>x</div>") );
         };
@@ -164,7 +179,7 @@
     },
     /** включается в аддон как saveSettings */
     saveAddonSettings: function() {
-        window.addonsLoader.storage[this.name]=this.settings;
+        window.addonsLoader.storage.addonsSettings[this.name]=this.settings;
         window.addonsLoader.saveStorage();
     },
     /** слушает когда придет сообщение установить настройки (используется в iframe для миграции) */
@@ -173,10 +188,10 @@
             var storageOnlyExports= JSON.parse(message.data.substring(12));
             for (var i in storageOnlyExports){
                 for (var j in storageOnlyExports[i]) {
-                    this.storage[i][j]= storageOnlyExports[i][j];
+                    window.addonsLoader.storage.addonsSettings[i][j]= storageOnlyExports[i][j];
                 };
             };
-            this.commitStorage();
+            window.addonsLoader.commitStorage();
             message.source.postMessage("SettingsSets:"+location.hostname, '*');
         }
     },
@@ -187,7 +202,8 @@
         this.storageOnlyExports={};
         for (var i in this.addons) {
             this.storageOnlyExports[i]= {};
-            for (var setting in this.addons[i].exports) {
+            for (var settingId in this.addons[i].exports) {
+                var setting= this.addons[i].exports[settingId];
                 var resolvedName= this.addons[i].namesResolver(setting.name);
                 var inputs= document.getElementsByName(resolvedName);
                 if (inputs.length==0) continue;
@@ -203,12 +219,12 @@
                         }
                     }
                 } else {
-                    var value= this.storage[this.addons[i].name][setting.name];
+                    var value= this.storage.addonsSettings[i][setting.name];
                 }
-                this.storageOnlyExports[this.addons[i].name][setting.name]= value;
+                this.storageOnlyExports[i][setting.name]= value;
+                this.storage.addonsSettings[i][setting.name]=value;
             };
         };
-        console.log(this.storageOnlyExports);
         this.commitStorage();
         var frames={};
         window.addEventListener("message", function(message, url){
@@ -256,6 +272,11 @@
     },
     toogleAddonEnabled: function(addonName, targetNode){
         this.storage.enabledAddons[addonName]= this.storage.enabledAddons[addonName]=="yes" ? "no":"yes";
+        if ( this.storage.enabledAddons[addonName]=="yes" ) {
+            $(targetNode).removeClass("addon-checkbox").addClass("addon-checkbox-clicked");
+        } else {
+            $(targetNode).removeClass("addon-checkbox-clicked").addClass("addon-checkbox");
+        }
         this.saveStorage();
     },
     
@@ -324,10 +345,15 @@
             newCss.type = "text/css"; 
             newCss.innerHTML = csstext; 
             head.appendChild(newCss); 
-        } 
+        },
+        arrayUnique: function(a) { // оставляет в массиве только уникальные значения
+            return a.reduce(function(p, c) {
+                if (p.indexOf(c) < 0) p.push(c);
+                return p;
+            }, []);
+        }
     }
 }
-addonsLoader.initStorage();
 
 document.addEventListener( "DOMContentLoaded", addonsLoader.checkStarted, false );
 addonsLoader.interval= window.setInterval(addonsLoader.checkStarted, 50);

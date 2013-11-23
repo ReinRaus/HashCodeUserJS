@@ -10,7 +10,7 @@ def joinFiles():
     for i in addons:
         with open("./addons/"+i, "rb") as f:
             result+= deleteBOM(f.read().decode('utf-8'))+",\n\n"
-    result+= "]; // end addons\naddonsLoader.callEventIterator('beforeInit');\n\n"
+    result+= "]; // end addons\naddonsLoader.initStorage();\naddonsLoader.callEventIterator('beforeInit');\n\n"
     regex= re.compile(r'\[DEPLOY:image64\](.*?)\[/DEPLOY\]', re.I)
     match= regex.search(result)
     while match:

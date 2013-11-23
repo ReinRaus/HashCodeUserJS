@@ -61,7 +61,7 @@ function joinFiles($path, $addons) {
         }
         $result.= $content.",\n\n";
     };
-    $result.= "]; // end addons\naddonsLoader.callEventIterator('beforeInit');\n\n";
+    $result.= "]; // end addons\naddonsLoader.initStorage();\naddonsLoader.callEventIterator('beforeInit');\n\n";
     $result= preg_replace_callback("/\[DEPLOY:image64\](.*?)\[\/DEPLOY\]/is", 
         function ($match) {
             global $path;
