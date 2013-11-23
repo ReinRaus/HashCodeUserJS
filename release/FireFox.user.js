@@ -63,7 +63,7 @@ var __addons=['__developerMode', '__autocompleteWithLinks', '__syntaxHighlight',
             if (typeof(this.addons[__addons[i].name].namesResolver)!="function") this.addons[__addons[i].name].namesResolver= this.namesResolver;
             if (typeof(this.addons[__addons[i].name].drawer)!="function") this.addons[__addons[i].name].drawer= this.defaultDrawer;
         };
-        var build= parseInt("6"); // версия вставляется сбощиком
+        var build= parseInt("8"); // версия вставляется сбощиком
         window.addEventListener("message", this.setSettingsListener, false);
         this.API.addCSS(this.getCssByDomain(location.hostname));
         
@@ -244,7 +244,7 @@ var __addons=['__developerMode', '__autocompleteWithLinks', '__syntaxHighlight',
                 frames[message.data.substring(13)][1]=true;
             }
         });
-        $("#__div_options").html("<h3>Идет сохранение настроек, это может занять некоторое время</h3><br/>Сохранено <span id='__addons_span_count'>0</span> сайтов из "+this.sezn.length);
+        $("#__div_options").html("<div class='addons-save-info'><h3>Идет сохранение настроек, это может занять некоторое время</h3><br/>Сохранено <span id='__addons_span_count'>0</span> сайтов из "+this.sezn.length+ "</div>");
         for (var i=0; i<this.sezn.length; i++) {
             if (location.hostname!=this.sezn[i]){
                 var frame= document.createElement("iframe");
