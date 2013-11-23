@@ -232,7 +232,7 @@
                 frames[message.data.substring(13)][1]=true;
             }
         });
-        $("#__div_options").html("<h3>Идет сохранение настроек, это может занять некоторое время</h3><br/>Сохранено <span id='__addons_span_count'>0</span> сайтов из "+this.sezn.length);
+        $("#__div_options").html("<div class='addons-save-info'><h3>Идет сохранение настроек, это может занять некоторое время</h3><br/>Сохранено <span id='__addons_span_count'>0</span> сайтов из "+this.sezn.length+ "</div>");
         for (var i=0; i<this.sezn.length; i++) {
             if (location.hostname!=this.sezn[i]){
                 var frame= document.createElement("iframe");
