@@ -38,7 +38,8 @@ var __addons=['__developerMode', '__autocompleteWithLinks', '__syntaxHighlight',
             this.saveStorage();
         };
         var addonsSettings= this.storage.addonsSettings;
-        for (var i in __addons) {
+        console.log(__addons.length, __addons);
+        for (var i=0; i<__addons.length; i++) {
             if (typeof(addonsSettings[__addons[i].name])=="undefined") {
                 addonsSettings[__addons[i].name]= {};
             }
@@ -50,6 +51,7 @@ var __addons=['__developerMode', '__autocompleteWithLinks', '__syntaxHighlight',
                     addonsSettings[__addons[i].name][j]= __addons[i].settings[j]; // переносим значения по-умолчанию в сохраненные настройки
                 }
             }
+            console.log(i, addonsSettings[__addons[i].name], __addons[i].name);
         }
     },
     
@@ -63,7 +65,7 @@ var __addons=['__developerMode', '__autocompleteWithLinks', '__syntaxHighlight',
             if (typeof(this.addons[__addons[i].name].namesResolver)!="function") this.addons[__addons[i].name].namesResolver= this.namesResolver;
             if (typeof(this.addons[__addons[i].name].drawer)!="function") this.addons[__addons[i].name].drawer= this.defaultDrawer;
         };
-        var build= parseInt("10"); // версия вставляется сбощиком
+        var build= parseInt("12"); // версия вставляется сбощиком
         window.addEventListener("message", this.setSettingsListener, false);
         this.API.addCSS(this.getCssByDomain(location.hostname));
         
@@ -232,6 +234,7 @@ var __addons=['__developerMode', '__autocompleteWithLinks', '__syntaxHighlight',
                     var value= this.storage.addonsSettings[i][setting.name];
                 }
                 this.storageOnlyExports[i][setting.name]= value;
+                console.log(this.storage);
                 this.storage.addonsSettings[i][setting.name]=value;
             };
         };
@@ -373,44 +376,37 @@ __addons=[
 
 ﻿{
     name: 'developerMode',
-    title: 'Режим разработчика <b>временно не работает</b>',
-    description: 'Вы можете сами создавать новые аддоны. Если Вы хотите отредактировать аддон, который входит в состав основной сборки, то нужно при создании нового аддона выбрать аддон на основе которого хотите создать. После этого отключите встроенный аддон, а новый будет загружаться автоматически.<br/>В настоящий момент нельзя смотреть страницу настроек таких скриптов- они всегда используют настройки по-умолчанию.<br/>Все созданные таким образом скрипты загружаются всегда. После того, как закончите творить новый аддон, сохраните его в отдельный файл в utf-8+BOM и сделайте pull request в репозиторий.<br/>Если произошла ошибка, то объект ошибки можно найти в консоли.',
+    title: 'Режим разработчика',
+    description: 'Вы можете сами создавать новые аддоны. Если Вы хотите отредактировать аддон, который входит в состав основной сборки, то нужно при создании нового аддона выбрать аддон на основе которого хотите создать, при этом не забывайте, что <b>name</b> должны быть уникальны. После этого отключите встроенный аддон, а новый будет загружаться автоматически.<br/>В настоящий момент нельзя смотреть страницу настроек таких скриптов- они всегда используют настройки по-умолчанию.<br/>Все созданные таким образом скрипты загружаются всегда. После того, как закончите творить новый аддон, сохраните его в отдельный файл в utf-8+BOM и сделайте pull request в репозиторий.<br/>Если произошла ошибка, то объект ошибки можно найти в консоли.<br/>Можно самому задать путь к CDN для CodeMirror (например выложить на localhost). Требуются файлы: [codemirror.js, codemirror.css, mode/javascript/javascript.js]',
     settings: {
         scripts: "[]",
         lastOpened: "0",
         maxHighlightLength: "Infinity",
         fontSize: '14px',
-        settings: "{}"
+        settings: "{}",
+        codeMirrorCDN: "http://cdnjs.cloudflare.com/ajax/libs/codemirror/3.19.0/"
     },
     exports: [
         {name:'scripts', type:'hidden'},
         {name:'lastOpened', type:'hidden'},
         {name:'settings', type:'hidden'},
         {name:'fontSize', type:"text", title:'Размер шрифта в редакторе'},
-        {name:'maxHighlightLength', type:'text',title:"Максимальная подсвечиваемая длина<br/><small>(в символах или Infinity)</small>"}
+        {name:'maxHighlightLength', type:'text',title:"Максимальная подсвечиваемая длина<br/><small>(в символах или Infinity)</small>"},
+        {name:'codeMirrorCDN', type:"text", title:'Code Mirror CDN'}
     ],
     run: function() {
-        return; // помещаю в коммит, но его нужно переписывать под новый формат, а с новым форматом новые плюшки
-        var addonName= arguments.callee.name;
-        var settings= __addonsSettings.getUpdatedSettings( addonName, defaultSettings );
-        var scripts= JSON.parse(settings.exports.scripts.value);
-        var lastOpened= settings.exports.lastOpened.value;
+        var scripts= JSON.parse(this.settings.scripts);
+        var lastOpened= parseInt(this.settings.lastOpened);
+        var thisAddon= this;
+        var settings= this.settings;
         var css= "div.addons-DM {left: 5px; width: 98%; max-width:100%; max-height:100%;} img.addons-DM-icon {width:16px; height:16px; margin-right:10px} div.addons-DM-new {position:relative; top:30px; left:10px;}";
-        __addonsAddCSS(css);
+        window.addonsLoader.API.addCSS(css);
         
-        var escapeHtml= function(text) {
-          return text
-              .replace(/&/g, "&amp;")
-              .replace(/</g, "&lt;")
-              .replace(/>/g, "&gt;")
-              .replace(/"/g, "&quot;")
-              .replace(/'/g, "&#039;");
-        };
-        
-        var saveSettings= function(scripts, lastOpened, reloadPage){
-            if (scripts!=null) settings.exports.scripts.value= JSON.stringify(scripts);
-            if (lastOpened!=null) settings.exports.lastOpened.value= lastOpened;
-            __addonsSettings.set(addonName, settings);
+        var saveData= function(scripts, lastOpened, reloadPage){
+            // TODO проверять уникальность name
+            if (scripts!=null) settings.scripts= JSON.stringify(scripts);
+            if (lastOpened!=null) settings.lastOpened= lastOpened.toString();
+            thisAddon.saveSettings();
             if (reloadPage) location.reload();
         };
         
@@ -420,7 +416,7 @@ __addons=[
         img.onclick= function(e) {
             div1.style.display= div1.style.display=="block" ? "none":"block";
         };
-        $(img).insertBefore($("#__imageIcon")[0]);
+        $(img).insertBefore($("a")[0]);
         var imgRect= img.getBoundingClientRect();
         
         var div1= document.createElement('div');
@@ -430,15 +426,14 @@ __addons=[
         
         var html= "<TABLE style='width:100%'><TR><TD width='*'><BUTTON onclick='$(\".addons-DM .addons-DM-new\").css(\"display\", \"block\");'>Новый...</BUTTON> <SELECT id='__addons_DM_selectScript' style='min-width:70px'>";
         for (var i in scripts) {
-            html+="<OPTION value='"+i+"' "+(i==parseInt(lastOpened) ? "selected='selected' >":">")+scripts[i].replace(/^[\s\S]*?function\s+([^\(]+)\([\s\S]*$/, "$1")+"</OPTION>";
+            html+="<OPTION value='"+i+"' "+(i==lastOpened ? "selected='selected' >":">")+this.getTextAddonParam(scripts[i], 'title')+"</OPTION>";
         };
         html+="</SELECT> <BUTTON id='__addons_DM_saveScript'>Сохранить</BUTTON> <BUTTON id='__addons_DM_saveAndUpdateScript'>Сохранить и обновить</BUTTON></TD><TD><BUTTON id='__addons_DM_deleteScript'>Удалить</BUTTON></TD></TR></TABLE><DIV class='addons-overflow'>";
         // блок с новым скриптом
-        html+="<DIV class='addons-settings addons-DM-new addons-overflow'><TABLE><TR><TD><INPUT type=radio name=addons_DM_new_blank value=blank checked >Чистый</TD><TD><INPUT type=text value='Имя функции' ></TD></TR><TR><TD><INPUT type=radio name=addons_DM_new_blank value=clone >На основе</TD><TD><SELECT>";
-        for (var i in __addons) {
-            var addon= __addonsSettings.settings[__addons[i]];
-            var title= addon == undefined ? __addons[i] : addon.title;
-            html+="<OPTION value='"+__addons[i]+"'>"+title+"</OPTION>";
+        html+="<DIV class='addons-settings addons-DM-new addons-overflow'><TABLE><TR><TD valign=top><INPUT type=radio name=addons_DM_new_blank value=blank checked >Чистый</TD><TD>Уникальный <b>name</b><BR/><INPUT type=text value='name' ><BR/>Заголовок <b>title</b><BR/><INPUT type=text value='title' ><BR/>Описание <b>description</b><BR/><INPUT type=text value='description' ></TD></TR><TR><TD><INPUT type=radio name=addons_DM_new_blank value=clone >На основе</TD><TD><SELECT>";
+        for (var i in window.addonsLoader.addons) {
+            var title= typeof(window.addonsLoader.addons[i].title)=="undefined" ? i:window.addonsLoader.addons[i].title;
+            html+="<OPTION value='"+i+"'>"+title+"</OPTION>";
         };
         html+="</SELECT></TD></TR></TABLE><BUTTON id='__addons_DM_createNew' >Создать</BUTTON><BUTTON onclick='$(\".addons-DM .addons-DM-new\").css(\"display\", \"none\");' >Закрыть</BUTTON></DIV>";
         // блок с CodeMirror
@@ -450,19 +445,19 @@ __addons=[
         var linkSS= document.createElement('link');
         linkSS.rel= "stylesheet";
         linkSS.type= "text/css";
-        linkSS.href="http://cdnjs.cloudflare.com/ajax/libs/codemirror/3.19.0/codemirror.css";
+        linkSS.href= settings.codeMirrorCDN+"codemirror.css";
         document.getElementsByTagName('head')[0].appendChild(linkSS);
         var script1= document.createElement("script");
-        script1.src='http://cdnjs.cloudflare.com/ajax/libs/codemirror/3.19.0/codemirror.js';
+        script1.src= settings.codeMirrorCDN+'codemirror.js';
         document.getElementsByTagName('head')[0].appendChild(script1);
             
         var editor; // глобалим
         var initCodeMirror= function(){
             img.onclick(); // наглый хак, но почему-то не происходит отрисовка CodeMirror в скрытый блок
             editor = CodeMirror(document.getElementById("__CodeMirrorArea"), {
-                value: scripts[lastOpened]==undefined? 'Чтобы создать новый скрипт нажмите New':scripts[lastOpened],
+                value: typeof(scripts[lastOpened])=="undefined"? 'Чтобы создать новый скрипт нажмите "Новый..."':scripts[lastOpened],
                 lineNumbers: true,
-                maxHighlightLength: settings.exports.maxHighlightLength.value=="Infinity"?Infinity:parseInt(settings.exports.maxHighlightLength.value)
+                maxHighlightLength: settings.maxHighlightLength=="Infinity"?Infinity:parseInt(settings.maxHighlightLength)
             });
             editor.display.scroller.parentNode.style.height="100%";
             editor.display.scroller.style.fontSize= settings.fontSize;
@@ -471,7 +466,7 @@ __addons=[
         var fixSlowLoading= function() {
             if (typeof(CodeMirror)=="undefined") return;
             var script2= document.createElement("script");
-            script2.src='http://cdnjs.cloudflare.com/ajax/libs/codemirror/3.19.0/mode/javascript/javascript.js';
+            script2.src= settings.codeMirrorCDN+'mode/javascript/javascript.js';
             document.getElementsByTagName('head')[0].appendChild(script2);
             window.setTimeout(initCodeMirror, 50);
             clearInterval(interval);
@@ -479,7 +474,8 @@ __addons=[
         var interval= window.setInterval(fixSlowLoading, 50);
         
         $("#__addons_DM_createNew").bind('click', function(){
-            var name=$(".addons-DM-new input[type='text']")[0].value.replace(/^\s+|\s+$/, '');
+            var $inputs= $(".addons-DM-new input[type='text']");
+            var name= $inputs[0].value.replace(/^\s+|\s+$/, '');
             var blankInputs= $(".addons-DM-new input[type='radio']");
             for (var i =0; i<blankInputs.length; i++) if (blankInputs[i].checked) var blank=blankInputs[i].value;
             if (blank=="clone") {
@@ -489,39 +485,43 @@ __addons=[
                     alert("Имя не задано");
                     return
                 };
-                var text="function "+name+"() {\n    var defaultSettings= {\n        title: '',\n        description: '',\n        exports: {\n        },\n        order: []\n    };\n    var settings= __addonsSettings.getUpdatedSettings( arguments.callee.name, defaultSettings );\n};\n";
+                var text="{\n    name: '"+name+"',\n    title: '"+$inputs[1].value+"',\n    description: '"+$inputs[2].value+"',\n    run: function() {\n        \n    }\n}";
             };
             scripts.push(text);
-            saveSettings(scripts, lastOpened, true);
+            saveData(scripts, lastOpened, true);
         });
         $('#__addons_DM_selectScript').bind("change", function(){
             scripts[lastOpened]= editor.doc.getValue();
             lastOpened= parseInt(this.value);
-            saveSettings(null, lastOpened, false);
+            saveData(null, lastOpened, false);
             if (typeof(editor)!= "undefined") editor.doc.setValue( scripts[lastOpened] );
         });
         $('#__addons_DM_deleteScript').bind("click", function() {
             var item= parseInt($('#__addons_DM_selectScript')[0].value);
             lastOpened= 0;
+            delete window.addonsLoader.storage.addonsSettings[thisAddon.getTextAddonParam(scripts[item], 'name')]
             scripts= scripts.slice(0, item).concat(scripts.slice(item+1));
-            saveSettings(scripts, lastOpened, true);
+            saveData(scripts, lastOpened, true);
         });
         $("#__addons_DM_saveScript").bind("click", function() {
             scripts[lastOpened]= editor.doc.getValue();
-            saveSettings(scripts, lastOpened, false);
+            saveData(scripts, lastOpened, false);
         });
         $("#__addons_DM_saveAndUpdateScript").bind("click", function() {
             scripts[lastOpened]= editor.doc.getValue();
-            saveSettings(scripts, lastOpened, true);
+            saveData(scripts, lastOpened, true);
         });
-        
-        var glush= "var __addonsSettings=new (function () {this.settings={}; this.get=function(addonName) {return this.settings[addonName];}; this.set= function(){}; this.getUpdatedSettings= function(addonName, defaultSettings) {this.settings[addonName]= defaultSettings;return defaultSettings;};})();"
-        for (var i in scripts) {
-            console.log('Запуск функции '+ $("#__addons_DM_selectScript option")[i].innerHTML);
-            var scr= document.createElement('script');
-            scr.innerHTML= "("+scripts[i].replace(/\}[^\}]*?$/, "})();").replace(/^([^\{]*\{)/, "$1"+glush);
-            document.getElementsByTagName('head')[0].appendChild(scr);
-        };
+    },
+    
+    beforeInit: function(){
+        var scripts= JSON.parse(this.settings.scripts);
+        var scr= document.createElement('script');
+        scr.innerHTML= "\nwindow.__addons.push(\n\n"+scripts.join(',\n\n')+"\n\n);\nconsole.log (addonsLoader.started);";
+        document.head.appendChild(scr);
+    },
+    
+    getTextAddonParam: function(text, param) {
+        return text.replace(new RegExp("^[\\s\\S]*?\\b"+param+"\\b[^:]*?:\\s*(?:'((?:\\\\[\\s\\S]|[^'])+)'|\"((?:\\\\[\\s\\S]|[^\"])+)\")[\\s\\S]*$"), "$1$2"); // TODO переписать хранение аддонов в scripts на ассоциативный массив
     }
 },
 
