@@ -38,7 +38,7 @@ var __addons=['__developerMode', '__autocompleteWithLinks', '__syntaxHighlight',
             this.saveStorage();
         };
         var addonsSettings= this.storage.addonsSettings;
-        console.log(__addons.length, __addons);
+        //console.log(__addons.length, __addons);
         for (var i=0; i<__addons.length; i++) {
             if (typeof(addonsSettings[__addons[i].name])=="undefined") {
                 addonsSettings[__addons[i].name]= {};
@@ -51,7 +51,7 @@ var __addons=['__developerMode', '__autocompleteWithLinks', '__syntaxHighlight',
                     addonsSettings[__addons[i].name][j]= __addons[i].settings[j]; // переносим значения по-умолчанию в сохраненные настройки
                 }
             }
-            console.log(i, addonsSettings[__addons[i].name], __addons[i].name);
+            //console.log(i, addonsSettings[__addons[i].name], __addons[i].name);
         }
     },
 
@@ -65,7 +65,7 @@ var __addons=['__developerMode', '__autocompleteWithLinks', '__syntaxHighlight',
             if (typeof(this.addons[__addons[i].name].namesResolver)!="function") this.addons[__addons[i].name].namesResolver= this.namesResolver;
             if (typeof(this.addons[__addons[i].name].drawer)!="function") this.addons[__addons[i].name].drawer= this.defaultDrawer;
         };
-        var build= parseInt("8"); // версия вставляется сбощиком
+        var build= parseInt("10"); // версия вставляется сбощиком
         window.addEventListener("message", this.setSettingsListener, false);
         this.API.addCSS(this.getCssByDomain(location.hostname));
 
@@ -295,7 +295,7 @@ var __addons=['__developerMode', '__autocompleteWithLinks', '__syntaxHighlight',
 
     callEventIterator: function(nameEvent) {
         for (var i in __addons) {
-            if ( typeof(__addons[i][nameEvent])=="function" && this.storage.enabledAddons[__addons.name]=="yes") __addons[i][nameEvent]();
+            if ( typeof(__addons[i][nameEvent])=="function" && this.storage.enabledAddons[__addons[i].name]=="yes") __addons[i][nameEvent]();
         }
     },
 
@@ -524,7 +524,7 @@ __addons=[
     beforeInit: function(){
         var scripts= JSON.parse(this.settings.scripts);
         var scr= document.createElement('script');
-        scr.innerHTML= "\nwindow.__addons.push(\n\n"+scripts.join(',\n\n')+"\n\n);\nconsole.log (addonsLoader.started);";
+        scr.innerHTML= "console.log(__addons.length);\nwindow.__addons.push(\n\n"+scripts.join(',\n\n')+"\n\n);\nconsole.log (__addons.length);";
         document.head.appendChild(scr);
     },
     
