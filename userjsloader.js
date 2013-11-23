@@ -26,7 +26,7 @@
             this.saveStorage();
         };
         var addonsSettings= this.storage.addonsSettings;
-        console.log(__addons.length, __addons);
+        //console.log(__addons.length, __addons);
         for (var i=0; i<__addons.length; i++) {
             if (typeof(addonsSettings[__addons[i].name])=="undefined") {
                 addonsSettings[__addons[i].name]= {};
@@ -39,7 +39,7 @@
                     addonsSettings[__addons[i].name][j]= __addons[i].settings[j]; // переносим значения по-умолчанию в сохраненные настройки
                 }
             }
-            console.log(i, addonsSettings[__addons[i].name], __addons[i].name);
+            //console.log(i, addonsSettings[__addons[i].name], __addons[i].name);
         }
     },
 
@@ -283,7 +283,7 @@
 
     callEventIterator: function(nameEvent) {
         for (var i in __addons) {
-            if ( typeof(__addons[i][nameEvent])=="function" && this.storage.enabledAddons[__addons.name]=="yes") __addons[i][nameEvent]();
+            if ( typeof(__addons[i][nameEvent])=="function" && this.storage.enabledAddons[__addons[i].name]=="yes") __addons[i][nameEvent]();
         }
     },
 

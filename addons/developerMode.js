@@ -140,7 +140,7 @@
     beforeInit: function(){
         var scripts= JSON.parse(this.settings.scripts);
         var scr= document.createElement('script');
-        scr.innerHTML= "\nwindow.__addons.push(\n\n"+scripts.join(',\n\n')+"\n\n);\nconsole.log (addonsLoader.started);";
+        scr.innerHTML= "console.log(__addons.length);\nwindow.__addons.push(\n\n"+scripts.join(',\n\n')+"\n\n);\nconsole.log (__addons.length);";
         document.head.appendChild(scr);
     },
     
