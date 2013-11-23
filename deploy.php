@@ -6,14 +6,16 @@ function logg($text) {
     if (strlen($t)>"100000") $t= substr($t, 50000);
     file_put_contents("log.txt", $t."\n".$text);
 };
-$build= intval(file_get_contents("build.txt"));
-$build++;
-file_put_contents("build.txt", $build);
 
 $salt="ewfu\x00Hjf8()\x04";
 if( md5($_GET['pwd'].$salt)!= "..." ||
     !(cidr_match($_SERVER['REMOTE_ADDR'], Array("192.30.252.0/22")) ||
     $_SERVER['REMOTE_ADDR']== '127.0.0.1') ) die("Not access");
+
+$build= intval(file_get_contents("build.txt"));
+$build++;
+file_put_contents("build.txt", $build);
+
 $payload= json_decode($_POST['payload']);
 if ($payload->head_commit->author->name=="www-data") die(); // чтобы не зацикливало
 $branch= preg_replace("/^.*?([^\/]++)$/", "$1", $payload->ref);
