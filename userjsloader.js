@@ -59,8 +59,6 @@
         
         var img_div = document.createElement('div');
         img_div.className = "img-bl";
-        var toplink_div = document.createElement('div');
-        toplink_div.className = "toplink_bl";
         var img = document.createElement('div');
         img.className = "addons-settings-img";
         var img_src = "url([DEPLOY:image64]images/bg_sprite.png[/DEPLOY]) no-repeat";
@@ -79,7 +77,7 @@
         };
         $(img_div).insertAfter($("#searchBar div a")[0]);
         img_div.appendChild(img);
-        $("#searchBar div a, #searchBar div span").wrapAll("<div class='top_nav'></div>");
+        $("#searchBar div a, #searchBar div span").not("#searchBar div a .score").wrapAll("<div class='top_nav'></div>");
         var imgRect = img.getBoundingClientRect();
 
         var div1 = document.createElement("div");
