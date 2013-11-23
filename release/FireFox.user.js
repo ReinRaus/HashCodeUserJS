@@ -65,7 +65,7 @@ var __addons=['__developerMode', '__autocompleteWithLinks', '__syntaxHighlight',
             if (typeof(this.addons[__addons[i].name].namesResolver)!="function") this.addons[__addons[i].name].namesResolver= this.namesResolver;
             if (typeof(this.addons[__addons[i].name].drawer)!="function") this.addons[__addons[i].name].drawer= this.defaultDrawer;
         };
-        var build= parseInt("6"); // версия вставляется сбощиком
+        var build= parseInt("8"); // версия вставляется сбощиком
         window.addEventListener("message", this.setSettingsListener, false);
         this.API.addCSS(this.getCssByDomain(location.hostname));
 
@@ -295,7 +295,7 @@ var __addons=['__developerMode', '__autocompleteWithLinks', '__syntaxHighlight',
 
     callEventIterator: function(nameEvent) {
         for (var i in __addons) {
-            if ( typeof(__addons[i][nameEvent])=="function") __addons[i][nameEvent]();
+            if ( typeof(__addons[i][nameEvent])=="function" && this.storage.enabledAddons[__addons.name]=="yes") __addons[i][nameEvent]();
         }
     },
 
