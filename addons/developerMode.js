@@ -140,7 +140,7 @@
     beforeInit: function(){
         var scripts= JSON.parse(this.settings.scripts);
         var scr= document.createElement('script');
-        scr.innerHTML= "console.log(__addons.length);\nwindow.__addons.push(\n\n"+scripts.join(',\n\n')+"\n\n);\nconsole.log (__addons.length);";
+        scr.innerHTML= "\nwindow.__addons.push(\n\n"+scripts.join(',\n\n')+"\n\n);\nif (!window.addonsLoader.started) {window.addonsLoader.initStorage();} else {console.log('Извините. Не успели внедрить режим разработчика.');};\n";
         document.head.appendChild(scr);
     },
     

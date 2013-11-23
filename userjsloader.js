@@ -26,7 +26,6 @@
             this.saveStorage();
         };
         var addonsSettings= this.storage.addonsSettings;
-        //console.log(__addons.length, __addons);
         for (var i=0; i<__addons.length; i++) {
             if (typeof(addonsSettings[__addons[i].name])=="undefined") {
                 addonsSettings[__addons[i].name]= {};
@@ -39,7 +38,6 @@
                     addonsSettings[__addons[i].name][j]= __addons[i].settings[j]; // переносим значения по-умолчанию в сохраненные настройки
                 }
             }
-            //console.log(i, addonsSettings[__addons[i].name], __addons[i].name);
         }
     },
 
@@ -187,6 +185,7 @@
         if (message.data.substring(0, 12)=="SetSettings:"){
             var storageOnlyExports= JSON.parse(message.data.substring(12));
             for (var i in storageOnlyExports){
+                if (typeof(window.addonsLoader.storage.addonsSettings[i])=='undefined') window.addonsLoader.storage.addonsSettings[i]={};
                 for (var j in storageOnlyExports[i]) {
                     window.addonsLoader.storage.addonsSettings[i][j]= storageOnlyExports[i][j];
                 };
@@ -206,23 +205,23 @@
                 var setting= this.addons[i].exports[settingId];
                 var resolvedName= this.addons[i].namesResolver(setting.name);
                 var inputs= document.getElementsByName(resolvedName);
-                if (inputs.length==0) continue;
-                if ( setting.type=="text" || setting.type=="textarea" || setting.type=="select" ) {
-                    var value= inputs[0].value;
-                } else if ( setting.type=="checkbox") {
-                    var value= inputs[0].checked ? '1':'0';
-                } else if ( setting.type=="radio") {
-                    for (var j=0; j<params.length; j++) {
-                        if (inputs[j].checked) {
-                            var value= params[j].value;
-                            break;
+                if (inputs.length!=0) {
+                    if ( setting.type=="text" || setting.type=="textarea" || setting.type=="select" ) {
+                        var value= inputs[0].value;
+                    } else if ( setting.type=="checkbox") {
+                        var value= inputs[0].checked ? '1':'0';
+                    } else if ( setting.type=="radio") {
+                        for (var j=0; j<params.length; j++) {
+                            if (inputs[j].checked) {
+                                var value= params[j].value;
+                                break;
+                            }
                         }
                     }
                 } else {
-                    var value= this.storage.addonsSettings[i][setting.name];
+                    var value= this.addons[i].settings[setting.name];
                 }
                 this.storageOnlyExports[i][setting.name]= value;
-                console.log(this.storage);
                 this.storage.addonsSettings[i][setting.name]=value;
             };
         };
