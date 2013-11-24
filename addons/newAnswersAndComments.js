@@ -1,4 +1,4 @@
-// @author Yura Ivanov
+﻿// @author Yura Ivanov
 function __newAnswersAndComments() {
   var defaultSettings= {
         title: 'Подсветка новых сообщений',

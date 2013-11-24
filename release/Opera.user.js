@@ -213,7 +213,7 @@ function __addonLoader() {
     if (typeof $ == 'undefined') return;
     clearInterval(__checkStartedInterval);
     __addonsStarted= true;
-    var build= parseInt("9");
+    var build= parseInt("11");
     window.addEventListener("message", function(message, url){
         if (message.data.substring(0, 12)=="SetSettings:"){
             var settings= JSON.parse(message.data.substring(12));
@@ -281,6 +281,9 @@ var __check__Started= function(){
 };
 var __checkStartedInterval= window.setInterval(__check__Started, 50);
 
+
+
+__addons=[
 
 ﻿// @author Yura Ivanov
 function __autocompleteWithLinks() {
@@ -361,7 +364,8 @@ function __autocompleteWithLinks() {
                         myField.focus();
                     });
         }
-};
+};,
+
 ﻿function __syntaxHighlight(){
   var defaultSettings= {
         title: 'Подсветка синтаксиса SyntaxHighlighter\'ом',
@@ -461,6 +465,7 @@ function __autocompleteWithLinks() {
   changeStyles("code {white-space: nowrap}");
   changeStyles(".syntaxhighlighter {width: 695px !important;overflow:auto !important;max-height:400px !important}");
 }
+,
 
 ﻿function __collapseLongCodeBlock() {
     var defaultSettings= {
@@ -483,8 +488,9 @@ function __autocompleteWithLinks() {
             $(".prettyprint code").css({"white-space": "nowrap"});
         };
     };
-};
-// @author Yura Ivanov
+};,
+
+﻿// @author Yura Ivanov
 function __newAnswersAndComments() {
   var defaultSettings= {
         title: 'Подсветка новых сообщений',
@@ -529,6 +535,7 @@ function __newAnswersAndComments() {
  window.localStorage.setItem('__read_comments_' + qid, JSON.stringify(nowcomments));
  window.localStorage.setItem('__opened_' + qid, true);
 }
+,
 
 ﻿function __sortBetter() {
         var defaultSettings= {
@@ -559,6 +566,7 @@ function __newAnswersAndComments() {
                 }
         }
 }
+,
 
 ﻿function __autocompleteWithSelection() {
     var defaultSettings= {
@@ -669,6 +677,11 @@ function __newAnswersAndComments() {
         }
     );
 };
+,
+
+]; // end addons
+addonsLoader.initStorage();
+addonsLoader.callEventIterator('beforeInit');
 
 
 };
