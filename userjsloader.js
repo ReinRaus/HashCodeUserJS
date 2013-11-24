@@ -281,7 +281,7 @@
     },
 
     callEventIterator: function(nameEvent) {
-        for (var i in __addons) {
+        for (var i=0; i<__addons.length; i++) {
             if ( typeof(__addons[i][nameEvent])=="function" && this.storage.enabledAddons[__addons[i].name]=="yes") __addons[i][nameEvent]();
         }
     },
