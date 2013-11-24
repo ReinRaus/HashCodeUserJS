@@ -1,29 +1,27 @@
 ﻿{
     name: 'developerMode',
     title: 'Режим разработчика',
-    description: 'Вы можете сами создавать новые аддоны. Если Вы хотите отредактировать аддон, который входит в состав основной сборки, то нужно при создании нового аддона выбрать аддон на основе которого хотите создать, при этом не забывайте, что <b>name</b> должны быть уникальны. После этого отключите встроенный аддон, а новый будет загружаться автоматически.<br/>В настоящий момент нельзя смотреть страницу настроек таких скриптов- они всегда используют настройки по-умолчанию.<br/>Все созданные таким образом скрипты загружаются всегда. После того, как закончите творить новый аддон, сохраните его в отдельный файл в utf-8+BOM и сделайте pull request в репозиторий.<br/>Если произошла ошибка, то объект ошибки можно найти в консоли.<br/>Можно самому задать путь к CDN для CodeMirror (например выложить на localhost). Требуются файлы: [codemirror.js, codemirror.css, mode/javascript/javascript.js]',
+    description: 'Вы можете сами создавать новые аддоны. Не забывайте, что <b>name</b> должны быть уникальны.<br/>После того, как закончите творить новый аддон, сохраните его в отдельный файл в utf-8+BOM и сделайте pull request в репозиторий.<br/>Если произошла ошибка, то объект ошибки можно найти в консоли.<br/>Можно самому задать путь к CDN для ACE (например выложить на localhost). Небольшой ошибкой при использовании ACE является вывод в консоль DOMException. Это не влияет на работу.',
     settings: {
         scripts: "[]",
         lastOpened: "0",
-        maxHighlightLength: "Infinity",
         fontSize: '14px',
         settings: "{}",
-        codeMirrorCDN: "http://cdnjs.cloudflare.com/ajax/libs/codemirror/3.19.0/"
+        aceCDN: "http://raw.github.com/ajaxorg/ace-builds/master/src-noconflict/"
     },
     exports: [
         {name:'scripts', type:'hidden'},
         {name:'lastOpened', type:'hidden'},
         {name:'settings', type:'hidden'},
         {name:'fontSize', type:"text", title:'Размер шрифта в редакторе'},
-        {name:'maxHighlightLength', type:'text',title:"Максимальная подсвечиваемая длина<br/><small>(в символах или Infinity)</small>"},
-        {name:'codeMirrorCDN', type:"text", title:'Code Mirror CDN'}
+        {name:'aceCDN', type:"text", title:'ACE CDN'}
     ],
     run: function() {
         var scripts= JSON.parse(this.settings.scripts);
         var lastOpened= parseInt(this.settings.lastOpened);
         var thisAddon= this;
         var settings= this.settings;
-        var css= "div.addons-DM {left: 5px; width: 98%; max-width:100%; max-height:100%;} img.addons-DM-icon {width:16px; height:16px; margin-right:10px} div.addons-DM-new {position:relative; top:30px; left:10px;}";
+        var css= "div.addons-DM {left: 5px; width: 98%; max-width:100%; max-height:100%;} img.addons-DM-icon {width:16px; height:16px; margin-right:10px} div.addons-DM-new {position:relative; top:30px; left:10px; height:250px}";
         window.addonsLoader.API.addCSS(css);
         
         var saveData= function(scripts, lastOpened, reloadPage){
@@ -37,8 +35,23 @@
         var img= document.createElement("img");
         img.src="[DEPLOY:image64]images/iconDM.png[/DEPLOY]";
         img.className='cursor-pointer addons-DM-icon'; // из лоадера
+        
+        var lockScroll = function(event) {
+            window.scrollTo(0, 0);
+            event ? event.preventDefault() : window.event.returnValue = false;
+        };
         img.onclick= function(e) {
             div1.style.display= div1.style.display=="block" ? "none":"block";
+            var array = ['DOMMouseScroll', 'mousewheel', 'scroll'];
+            if (div1.style.display=="block") {
+                for (var i=0; i<array.length; i++) {
+                    window.addEventListener(array[i], lockScroll, false);
+                }
+            } else {
+                for (var i=0; i<array.length; i++) {
+                    window.removeEventListener(array[i], lockScroll, false);
+                }
+            }
         };
         $(img).insertBefore($("a")[0]);
         var imgRect= img.getBoundingClientRect();
@@ -48,7 +61,7 @@
         div1.style.top=(imgRect.top+imgRect.height+5)+"px";
         div1.style.height= "90%";
         
-        var html= "<TABLE style='width:100%'><TR><TD width='*'><BUTTON onclick='$(\".addons-DM .addons-DM-new\").css(\"display\", \"block\");'>Новый...</BUTTON> <SELECT id='__addons_DM_selectScript' style='min-width:70px'>";
+        var html= "<TABLE style='width:100%'><TR><TD width='*'><BUTTON onclick='$(\".addons-DM .addons-DM-new\").css(\"display\", \"block\");$(\"#__EditorArea\").css(\"display\", \"none\");'>Новый...</BUTTON> <SELECT id='__addons_DM_selectScript' style='min-width:70px'>";
         for (var i in scripts) {
             html+="<OPTION value='"+i+"' "+(i==lastOpened ? "selected='selected' >":">")+this.getTextAddonParam(scripts[i], 'title')+"</OPTION>";
         };
@@ -59,41 +72,28 @@
             var title= typeof(window.addonsLoader.addons[i].title)=="undefined" ? i:window.addonsLoader.addons[i].title;
             html+="<OPTION value='"+i+"'>"+title+"</OPTION>";
         };
-        html+="</SELECT></TD></TR></TABLE><BUTTON id='__addons_DM_createNew' >Создать</BUTTON><BUTTON onclick='$(\".addons-DM .addons-DM-new\").css(\"display\", \"none\");' >Закрыть</BUTTON></DIV>";
-        // блок с CodeMirror
-        html+="<DIV style='width:100%; height:100%' id='__CodeMirrorArea' ></DIV>";
+        html+="</SELECT></TD></TR></TABLE><BUTTON id='__addons_DM_createNew' >Создать</BUTTON><BUTTON onclick='$(\".addons-DM .addons-DM-new\").css(\"display\", \"none\");$(\"#__EditorArea\").css(\"display\", \"block\");' >Закрыть</BUTTON></DIV>";
+        // блок с редактором кода
+        html+="<DIV style='width:100%; height:100%' id='__EditorArea' ></DIV>";
         
         div1.innerHTML= html;
         document.body.appendChild(div1);
         
-        var linkSS= document.createElement('link');
-        linkSS.rel= "stylesheet";
-        linkSS.type= "text/css";
-        linkSS.href= settings.codeMirrorCDN+"codemirror.css";
-        document.getElementsByTagName('head')[0].appendChild(linkSS);
         var script1= document.createElement("script");
-        script1.src= settings.codeMirrorCDN+'codemirror.js';
+        script1.src= settings.aceCDN+'ace.js';
         document.getElementsByTagName('head')[0].appendChild(script1);
             
         var editor; // глобалим
-        var initCodeMirror= function(){
-            img.onclick(); // наглый хак, но почему-то не происходит отрисовка CodeMirror в скрытый блок
-            editor = CodeMirror(document.getElementById("__CodeMirrorArea"), {
-                value: typeof(scripts[lastOpened])=="undefined"? 'Чтобы создать новый скрипт нажмите "Новый..."':scripts[lastOpened],
-                lineNumbers: true,
-                maxHighlightLength: settings.maxHighlightLength=="Infinity"?Infinity:parseInt(settings.maxHighlightLength)
-            });
-            editor.display.scroller.parentNode.style.height="100%";
-            editor.display.scroller.style.fontSize= settings.fontSize;
-            img.onclick();
-        };
         var fixSlowLoading= function() {
-            if (typeof(CodeMirror)=="undefined") return;
-            var script2= document.createElement("script");
-            script2.src= settings.codeMirrorCDN+'mode/javascript/javascript.js';
-            document.getElementsByTagName('head')[0].appendChild(script2);
-            window.setTimeout(initCodeMirror, 50);
+            if (typeof(ace)=="undefined") return;
             clearInterval(interval);
+            document.getElementById('__EditorArea').style.fontSize= settings.fontSize;
+            editor= ace.edit("__EditorArea");
+            editor.setValue(typeof(scripts[lastOpened])=="undefined"? 'Чтобы создать новый скрипт нажмите "Новый..."':scripts[lastOpened]);
+            editor.setTheme("ace/theme/eclipse");
+            editor.getSession().setMode("ace/mode/javascript");
+            editor.selection.clearSelection();
+            $('.ace_content').css({'height':'auto'});
         };
         var interval= window.setInterval(fixSlowLoading, 50);
         
@@ -103,7 +103,8 @@
             var blankInputs= $(".addons-DM-new input[type='radio']");
             for (var i =0; i<blankInputs.length; i++) if (blankInputs[i].checked) var blank=blankInputs[i].value;
             if (blank=="clone") {
-                var text= window[$(".addons-DM-new select")[0].value].toString();
+                alert( "К сожалению в настоящее время возможность недоступна. Возьмите исходный код из репозитория.");
+                return;
             } else {
                 if (name=="") {
                     alert("Имя не задано");
@@ -115,10 +116,10 @@
             saveData(scripts, lastOpened, true);
         });
         $('#__addons_DM_selectScript').bind("change", function(){
-            scripts[lastOpened]= editor.doc.getValue();
+            scripts[lastOpened]= editor.getValue();
             lastOpened= parseInt(this.value);
             saveData(null, lastOpened, false);
-            if (typeof(editor)!= "undefined") editor.doc.setValue( scripts[lastOpened] );
+            if (typeof(editor)!= "undefined") editor.setValue( scripts[lastOpened] );
         });
         $('#__addons_DM_deleteScript').bind("click", function() {
             var item= parseInt($('#__addons_DM_selectScript')[0].value);
@@ -128,11 +129,11 @@
             saveData(scripts, lastOpened, true);
         });
         $("#__addons_DM_saveScript").bind("click", function() {
-            scripts[lastOpened]= editor.doc.getValue();
+            scripts[lastOpened]= editor.getValue();
             saveData(scripts, lastOpened, false);
         });
         $("#__addons_DM_saveAndUpdateScript").bind("click", function() {
-            scripts[lastOpened]= editor.doc.getValue();
+            scripts[lastOpened]= editor.getValue();
             saveData(scripts, lastOpened, true);
         });
     },
