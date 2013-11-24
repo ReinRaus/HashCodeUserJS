@@ -7,14 +7,16 @@
         lastOpened: "0",
         fontSize: '14px',
         settings: "{}",
-        aceCDN: "http://raw.github.com/ajaxorg/ace-builds/master/src-noconflict/"
+        aceCDN: "http://raw.github.com/ajaxorg/ace-builds/master/src-noconflict/",
+        jslintCDN: 'https://raw.github.com/douglascrockford/JSLint/master/'
     },
     exports: [
         {name:'scripts', type:'hidden'},
         {name:'lastOpened', type:'hidden'},
         {name:'settings', type:'hidden'},
         {name:'fontSize', type:"text", title:'Размер шрифта в редакторе'},
-        {name:'aceCDN', type:"text", title:'ACE CDN'}
+        {name:'aceCDN', type:"text", title:'ACE CDN'},
+        {name:'jslintCDN', type:"text", title:'JSlint CDN'}
     ],
     run: function() {
         var scripts= JSON.parse(this.settings.scripts);
@@ -65,7 +67,7 @@
         for (var i in scripts) {
             html+="<OPTION value='"+i+"' "+(i==lastOpened ? "selected='selected' >":">")+this.getTextAddonParam(scripts[i], 'title')+"</OPTION>";
         };
-        html+="</SELECT> <BUTTON id='__addons_DM_saveScript'>Сохранить</BUTTON> <BUTTON id='__addons_DM_saveAndUpdateScript'>Сохранить и обновить</BUTTON></TD><TD><BUTTON id='__addons_DM_deleteScript'>Удалить</BUTTON></TD></TR></TABLE><DIV class='addons-overflow'>";
+        html+="</SELECT> <BUTTON id='__addons_DM_saveScript'>Сохранить</BUTTON> <BUTTON id='__addons_DM_saveAndUpdateScript'>Сохранить и обновить</BUTTON> <BUTTON id='__addons_DM_check'>Проверить</BUTTON></TD><TD><BUTTON id='__addons_DM_deleteScript'>Удалить</BUTTON></TD></TR></TABLE><DIV class='addons-overflow'>";
         // блок с новым скриптом
         html+="<DIV class='addons-settings addons-DM-new addons-overflow'><TABLE><TR><TD valign=top><INPUT type=radio name=addons_DM_new_blank value=blank checked >Чистый</TD><TD>Уникальный <b>name</b><BR/><INPUT type=text value='name' ><BR/>Заголовок <b>title</b><BR/><INPUT type=text value='title' ><BR/>Описание <b>description</b><BR/><INPUT type=text value='description' ></TD></TR><TR><TD><INPUT type=radio name=addons_DM_new_blank value=clone >На основе</TD><TD><SELECT>";
         for (var i in window.addonsLoader.addons) {
