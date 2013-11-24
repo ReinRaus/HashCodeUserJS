@@ -63,7 +63,7 @@ var __addons=['__developerMode', '__autocompleteWithLinks', '__syntaxHighlight',
             if (typeof(this.addons[__addons[i].name].namesResolver)!="function") this.addons[__addons[i].name].namesResolver= this.namesResolver;
             if (typeof(this.addons[__addons[i].name].drawer)!="function") this.addons[__addons[i].name].drawer= this.defaultDrawer;
         };
-        var build= parseInt("8"); // версия вставляется сбощиком
+        var build= parseInt("9"); // версия вставляется сбощиком
         window.addEventListener("message", this.setSettingsListener, false);
         this.API.addCSS(this.getCssByDomain(location.hostname));
 
@@ -114,7 +114,7 @@ var __addons=['__developerMode', '__autocompleteWithLinks', '__syntaxHighlight',
         for (var i in __addons) {
             $('#' + __addons[i].name + '').css("background", img_src);
             if (this.storage.enabledAddons[__addons[i].name] == "yes") {
-                __addons[i].run();
+                if (typeof(__addons[i].run)=='function') __addons[i].run();
                 $('#' + __addons[i].name + '').removeClass("addon-checkbox").addClass("addon-checkbox-clicked");
             } else $('#' + __addons[i].name + '').removeClass("addon-checkbox-clicked").addClass("addon-checkbox");
         }
@@ -300,7 +300,7 @@ var __addons=['__developerMode', '__autocompleteWithLinks', '__syntaxHighlight',
 
     getCssByDomain: function (domain) {
         if (domain=="localhost") domain= "meta.hashcode.ru";
-        var css = ".top_nav{float:left;width:680px}.img-bl,.img-bl-clicked{float:left;overflow:hidden;height:16px;width:16px;margin-left:9px;border:2px solid #F5F5F5;cursor:pointer;}.img-bl-clicked{height:18px;border-radius:10px 0px 0px 0px;}.addons-settings-img,.addons-settings-img-clicked{width:16px;height:18px;cursor:pointer;}.addons-settings{display:none;position:absolute;z-index:99;width:546px;height:268px;border-radius:10px 0px 0px 0px }.addons-overflow{overflow-y:auto;height:232px;margin-top:5px;}.addons-listitem,.addons-listitem-clicked{height:20px;width:500px;margin-top:6px;}.addons-listitem-clicked .addon-name span{color:white}.addon-checkbox,.addon-checkbox:hover{float:right; height:20px;width:20px;cursor:pointer;background-color:transparent} .addon-checkbox-clicked,.addon-checkbox-clicked:hover{float:right;height:20px;width:20px;cursor:pointer;background-color:transparent}.addon-name{float:left;height:20px;width:350px;word-wrap:break-word;background-color:transparent;text-align:left}.addon-name span{cursor:pointer}.addon-desc-ico{float:left;width:13px;margin-right:5px;text-align:center;border-radius:20px;color:#fff;font:bold 12px Arial;cursor:pointer}.addons-desc-bl{width:300px;padding:5px;word-wrap:break-word;position:absolute;top:0;left:548px;border-radius: 0px 10px 10px 0px;text-align:left;}.addons-desc-ex{font-weight: bold;float:right;color:red;cursor:pointer;}.addons-but-save,.addons-but-save:hover{float:left;width:70px;margin-top:10px;text-align:center;color:#333333;cursor:pointer;}.addons-but-save:hover{color:#000;}.addons-but-close,.addons-but-close:hover{float:left;width:60px;margin-left:10px;margin-top:10px;text-align:center;color:#333333;cursor:pointer;}.addons-but-close:hover{color:#000;}.addons-save-info{text-align:center;padding-top:10px;}.addons-save-info h3{padding-bottom:10px}";
+        var css = ".top_nav{float:left;width:680px}.img-bl,.img-bl-clicked{float:left;overflow:hidden;height:16px;width:16px;margin-left:9px;border:2px solid #F5F5F5;cursor:pointer;}.img-bl-clicked{height:18px;border-radius:10px 0px 0px 0px;}.addons-settings-img,.addons-settings-img-clicked{width:16px;height:18px;cursor:pointer;}.addons-settings{display:none;position:absolute;z-index:99;width:546px;height:268px;border-radius:10px 0px 0px 0px }.addons-overflow{overflow-y:auto;height:100%;margin-top:5px;}.addons-listitem,.addons-listitem-clicked{height:20px;width:500px;margin-top:6px;}.addons-listitem-clicked .addon-name span{color:white}.addon-checkbox,.addon-checkbox:hover{float:right; height:20px;width:20px;cursor:pointer;background-color:transparent} .addon-checkbox-clicked,.addon-checkbox-clicked:hover{float:right;height:20px;width:20px;cursor:pointer;background-color:transparent}.addon-name{float:left;height:20px;width:350px;word-wrap:break-word;background-color:transparent;text-align:left}.addon-name span{cursor:pointer}.addon-desc-ico{float:left;width:13px;margin-right:5px;text-align:center;border-radius:20px;color:#fff;font:bold 12px Arial;cursor:pointer}.addons-desc-bl{width:300px;padding:5px;word-wrap:break-word;position:absolute;top:0;left:548px;border-radius: 0px 10px 10px 0px;text-align:left;}.addons-desc-ex{font-weight: bold;float:right;color:red;cursor:pointer;}.addons-but-save,.addons-but-save:hover{float:left;width:70px;margin-top:10px;text-align:center;color:#333333;cursor:pointer;}.addons-but-save:hover{color:#000;}.addons-but-close,.addons-but-close:hover{float:left;width:60px;margin-left:10px;margin-top:10px;text-align:center;color:#333333;cursor:pointer;}.addons-but-close:hover{color:#000;}.addons-save-info{text-align:center;padding-top:10px;}.addons-save-info h3{padding-bottom:10px}";
         switch (domain) {
             case this.sezn[0]:
                 css += ".img-bl-clicked{border:2px solid #AF7817;background-color:#AF7817;}.addons-settings-img-clicked{background-position: 0 -15px !important;}.addons-settings {border:2px solid #AF7817;background-color: #EEEEEE;}.addons-listitem {border-bottom: 1px solid #fbac6f;background-color:white}.addons-listitem-clicked{border-bottom: 1px solid #fbac6f;background-color:#AF7817} .addon-checkbox {background-position: 0 -45px !important;} .addon-checkbox:hover {background-position: 0 -70px !important;} .addon-checkbox-clicked{background-position: 0 -95px !important;} .addon-checkbox-clicked:hover{background-position: 0 -120px !important;}.addon-desc-ico{border: 1px solid #ccc;background: #AF7817;}.addons-desc-bl{border:1px solid #AF7817;background-color:white;}.addons-but-save{border:2px solid #AF7817;background-color:#AF7817;}.addons-but-save:hover{border:2px solid #ECE5B6;background-color:#ECE5B6;}.addons-but-close{border:2px solid #AF7817;background-color:#AF7817;}.addons-but-close:hover{border:2px solid #ECE5B6;background-color:#ECE5B6;}.addons-save-info h3{border-bottom: 1px solid #fbac6f;}";
@@ -384,29 +384,27 @@ __addons=[
 ﻿{
     name: 'developerMode',
     title: 'Режим разработчика',
-    description: 'Вы можете сами создавать новые аддоны. Если Вы хотите отредактировать аддон, который входит в состав основной сборки, то нужно при создании нового аддона выбрать аддон на основе которого хотите создать, при этом не забывайте, что <b>name</b> должны быть уникальны. После этого отключите встроенный аддон, а новый будет загружаться автоматически.<br/>В настоящий момент нельзя смотреть страницу настроек таких скриптов- они всегда используют настройки по-умолчанию.<br/>Все созданные таким образом скрипты загружаются всегда. После того, как закончите творить новый аддон, сохраните его в отдельный файл в utf-8+BOM и сделайте pull request в репозиторий.<br/>Если произошла ошибка, то объект ошибки можно найти в консоли.<br/>Можно самому задать путь к CDN для CodeMirror (например выложить на localhost). Требуются файлы: [codemirror.js, codemirror.css, mode/javascript/javascript.js]',
+    description: 'Вы можете сами создавать новые аддоны. Не забывайте, что <b>name</b> должны быть уникальны.<br/>После того, как закончите творить новый аддон, сохраните его в отдельный файл в utf-8+BOM и сделайте pull request в репозиторий.<br/>Если произошла ошибка, то объект ошибки можно найти в консоли.<br/>Можно самому задать путь к CDN для ACE (например выложить на localhost). Небольшой ошибкой при использовании ACE является вывод в консоль DOMException. Это не влияет на работу.',
     settings: {
         scripts: "[]",
         lastOpened: "0",
-        maxHighlightLength: "Infinity",
         fontSize: '14px',
         settings: "{}",
-        codeMirrorCDN: "http://cdnjs.cloudflare.com/ajax/libs/codemirror/3.19.0/"
+        aceCDN: "http://raw.github.com/ajaxorg/ace-builds/master/src-noconflict/"
     },
     exports: [
         {name:'scripts', type:'hidden'},
         {name:'lastOpened', type:'hidden'},
         {name:'settings', type:'hidden'},
         {name:'fontSize', type:"text", title:'Размер шрифта в редакторе'},
-        {name:'maxHighlightLength', type:'text',title:"Максимальная подсвечиваемая длина<br/><small>(в символах или Infinity)</small>"},
-        {name:'codeMirrorCDN', type:"text", title:'Code Mirror CDN'}
+        {name:'aceCDN', type:"text", title:'ACE CDN'}
     ],
     run: function() {
         var scripts= JSON.parse(this.settings.scripts);
         var lastOpened= parseInt(this.settings.lastOpened);
         var thisAddon= this;
         var settings= this.settings;
-        var css= "div.addons-DM {left: 5px; width: 98%; max-width:100%; max-height:100%;} img.addons-DM-icon {width:16px; height:16px; margin-right:10px} div.addons-DM-new {position:relative; top:30px; left:10px;}";
+        var css= "div.addons-DM {left: 5px; width: 98%; max-width:100%; max-height:100%;} img.addons-DM-icon {width:16px; height:16px; margin-right:10px} div.addons-DM-new {position:relative; top:30px; left:10px; height:250px}";
         window.addonsLoader.API.addCSS(css);
         
         var saveData= function(scripts, lastOpened, reloadPage){
@@ -420,8 +418,23 @@ __addons=[
         var img= document.createElement("img");
         img.src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAEgSURBVFhH7dhBDoIwEIXh6p28j649lK69imuPAlvxJW1iCENnOsMrC/6EAFHCZ2ldcBqG4Zt+Xa4P7Dbt/bzlI33nvKfUMghUILIi6UBkQYpzsGW+SEkgzT0oIyhBNCNJe8StSOocbEHSF4kV2WUVW5BdgEiLNAFxcdksSddpkM0jqEXWvldDuh5x7ebaH7GGdM9BCaHFlSRkyCKZY6y40hIyBIgKqhUnFQZE0TjkAkrzplT7XJN7BCXE53XPR75CHvEcifNxHPOZr7A5CFTZIgtdJFt0AL0dQEtLf/S7AS7h8I+wC6CEQ92BazhEebMgVcOhbiOowaEuQC0O0YEWHKICrThEA7bgEPUd9X8aHOqySLQ4RAdacIgKtOJSSmkCrG2KMcBjtA0AAAAASUVORK5CYII=";
         img.className='cursor-pointer addons-DM-icon'; // из лоадера
+        
+        var lockScroll = function(event) {
+            window.scrollTo(0, 0);
+            event ? event.preventDefault() : window.event.returnValue = false;
+        };
         img.onclick= function(e) {
             div1.style.display= div1.style.display=="block" ? "none":"block";
+            var array = ['DOMMouseScroll', 'mousewheel', 'scroll'];
+            if (div1.style.display=="block") {
+                for (var i=0; i<array.length; i++) {
+                    window.addEventListener(array[i], lockScroll, false);
+                }
+            } else {
+                for (var i=0; i<array.length; i++) {
+                    window.removeEventListener(array[i], lockScroll, false);
+                }
+            }
         };
         $(img).insertBefore($("a")[0]);
         var imgRect= img.getBoundingClientRect();
@@ -431,7 +444,7 @@ __addons=[
         div1.style.top=(imgRect.top+imgRect.height+5)+"px";
         div1.style.height= "90%";
         
-        var html= "<TABLE style='width:100%'><TR><TD width='*'><BUTTON onclick='$(\".addons-DM .addons-DM-new\").css(\"display\", \"block\");'>Новый...</BUTTON> <SELECT id='__addons_DM_selectScript' style='min-width:70px'>";
+        var html= "<TABLE style='width:100%'><TR><TD width='*'><BUTTON onclick='$(\".addons-DM .addons-DM-new\").css(\"display\", \"block\");$(\"#__EditorArea\").css(\"display\", \"none\");'>Новый...</BUTTON> <SELECT id='__addons_DM_selectScript' style='min-width:70px'>";
         for (var i in scripts) {
             html+="<OPTION value='"+i+"' "+(i==lastOpened ? "selected='selected' >":">")+this.getTextAddonParam(scripts[i], 'title')+"</OPTION>";
         };
@@ -442,41 +455,28 @@ __addons=[
             var title= typeof(window.addonsLoader.addons[i].title)=="undefined" ? i:window.addonsLoader.addons[i].title;
             html+="<OPTION value='"+i+"'>"+title+"</OPTION>";
         };
-        html+="</SELECT></TD></TR></TABLE><BUTTON id='__addons_DM_createNew' >Создать</BUTTON><BUTTON onclick='$(\".addons-DM .addons-DM-new\").css(\"display\", \"none\");' >Закрыть</BUTTON></DIV>";
-        // блок с CodeMirror
-        html+="<DIV style='width:100%; height:100%' id='__CodeMirrorArea' ></DIV>";
+        html+="</SELECT></TD></TR></TABLE><BUTTON id='__addons_DM_createNew' >Создать</BUTTON><BUTTON onclick='$(\".addons-DM .addons-DM-new\").css(\"display\", \"none\");$(\"#__EditorArea\").css(\"display\", \"block\");' >Закрыть</BUTTON></DIV>";
+        // блок с редактором кода
+        html+="<DIV style='width:100%; height:100%' id='__EditorArea' ></DIV>";
         
         div1.innerHTML= html;
         document.body.appendChild(div1);
         
-        var linkSS= document.createElement('link');
-        linkSS.rel= "stylesheet";
-        linkSS.type= "text/css";
-        linkSS.href= settings.codeMirrorCDN+"codemirror.css";
-        document.getElementsByTagName('head')[0].appendChild(linkSS);
         var script1= document.createElement("script");
-        script1.src= settings.codeMirrorCDN+'codemirror.js';
+        script1.src= settings.aceCDN+'ace.js';
         document.getElementsByTagName('head')[0].appendChild(script1);
             
         var editor; // глобалим
-        var initCodeMirror= function(){
-            img.onclick(); // наглый хак, но почему-то не происходит отрисовка CodeMirror в скрытый блок
-            editor = CodeMirror(document.getElementById("__CodeMirrorArea"), {
-                value: typeof(scripts[lastOpened])=="undefined"? 'Чтобы создать новый скрипт нажмите "Новый..."':scripts[lastOpened],
-                lineNumbers: true,
-                maxHighlightLength: settings.maxHighlightLength=="Infinity"?Infinity:parseInt(settings.maxHighlightLength)
-            });
-            editor.display.scroller.parentNode.style.height="100%";
-            editor.display.scroller.style.fontSize= settings.fontSize;
-            img.onclick();
-        };
         var fixSlowLoading= function() {
-            if (typeof(CodeMirror)=="undefined") return;
-            var script2= document.createElement("script");
-            script2.src= settings.codeMirrorCDN+'mode/javascript/javascript.js';
-            document.getElementsByTagName('head')[0].appendChild(script2);
-            window.setTimeout(initCodeMirror, 50);
+            if (typeof(ace)=="undefined") return;
             clearInterval(interval);
+            document.getElementById('__EditorArea').style.fontSize= settings.fontSize;
+            editor= ace.edit("__EditorArea");
+            editor.setValue(typeof(scripts[lastOpened])=="undefined"? 'Чтобы создать новый скрипт нажмите "Новый..."':scripts[lastOpened]);
+            editor.setTheme("ace/theme/eclipse");
+            editor.getSession().setMode("ace/mode/javascript");
+            editor.selection.clearSelection();
+            $('.ace_content').css({'height':'auto'});
         };
         var interval= window.setInterval(fixSlowLoading, 50);
         
@@ -486,7 +486,8 @@ __addons=[
             var blankInputs= $(".addons-DM-new input[type='radio']");
             for (var i =0; i<blankInputs.length; i++) if (blankInputs[i].checked) var blank=blankInputs[i].value;
             if (blank=="clone") {
-                var text= window[$(".addons-DM-new select")[0].value].toString();
+                alert( "К сожалению в настоящее время возможность недоступна. Возьмите исходный код из репозитория.");
+                return;
             } else {
                 if (name=="") {
                     alert("Имя не задано");
@@ -498,10 +499,10 @@ __addons=[
             saveData(scripts, lastOpened, true);
         });
         $('#__addons_DM_selectScript').bind("change", function(){
-            scripts[lastOpened]= editor.doc.getValue();
+            scripts[lastOpened]= editor.getValue();
             lastOpened= parseInt(this.value);
             saveData(null, lastOpened, false);
-            if (typeof(editor)!= "undefined") editor.doc.setValue( scripts[lastOpened] );
+            if (typeof(editor)!= "undefined") editor.setValue( scripts[lastOpened] );
         });
         $('#__addons_DM_deleteScript').bind("click", function() {
             var item= parseInt($('#__addons_DM_selectScript')[0].value);
@@ -511,11 +512,11 @@ __addons=[
             saveData(scripts, lastOpened, true);
         });
         $("#__addons_DM_saveScript").bind("click", function() {
-            scripts[lastOpened]= editor.doc.getValue();
+            scripts[lastOpened]= editor.getValue();
             saveData(scripts, lastOpened, false);
         });
         $("#__addons_DM_saveAndUpdateScript").bind("click", function() {
-            scripts[lastOpened]= editor.doc.getValue();
+            scripts[lastOpened]= editor.getValue();
             saveData(scripts, lastOpened, true);
         });
     },
