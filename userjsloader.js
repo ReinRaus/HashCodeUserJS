@@ -75,9 +75,9 @@
                 $(".addons-settings-img").removeClass("addons-settings-img").addClass("addons-settings-img-clicked");
             };
         };
-        $(img_div).insertAfter($("#searchBar div a")[0]);
+        $("#searchBar div")[0].innerHTML= "<div class='top_nav'>"+$("#searchBar div")[0].innerHTML.replace(/(<input)/i, "</div><input");
+		$(img_div).insertAfter($("#searchBar div.top_nav")[0]);
         img_div.appendChild(img);
-        $("#searchBar div a, #searchBar div span").not("#searchBar div a .score").wrapAll("<div class='top_nav'></div>");
         var imgRect = img.getBoundingClientRect();
 
         var div1 = document.createElement("div");
