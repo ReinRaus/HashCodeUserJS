@@ -1,4 +1,4 @@
-{
+﻿{
     name: 'SearchFromGoogle',
     title: 'Поиск от Google',
     description: 'Из строки поиска поиск будет осуществляться при помощи запроса вида <br/><pre>site:hashcode.ru запрос</pre><br/>что дает более релевантные результаты.',

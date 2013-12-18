@@ -9,7 +9,7 @@
 
 function __extension__wrapper__(){
 
-var __addons=['__developerMode', '__autocompleteWithLinks', '__syntaxHighlight', '__collapseLongCodeBlock', '__newAnswersAndComments', '__sortBetter', '__autocompleteWithSelection'];
+var __addons=['__developerMode', '__autocompleteWithLinks', '__syntaxHighlight', '__collapseLongCodeBlock', '__newAnswersAndComments', '__SearchFromGoogle', '__sortBetter', '__autocompleteWithSelection'];
 ﻿addonsLoader= {
     /** Все аддоны как объекты */
     addons: {},
@@ -63,7 +63,7 @@ var __addons=['__developerMode', '__autocompleteWithLinks', '__syntaxHighlight',
             if (typeof(this.addons[__addons[i].name].namesResolver)!="function") this.addons[__addons[i].name].namesResolver= this.namesResolver;
             if (typeof(this.addons[__addons[i].name].drawer)!="function") this.addons[__addons[i].name].drawer= this.defaultDrawer;
         };
-        var build= parseInt("13"); // версия вставляется сбощиком
+        var build= parseInt("14"); // версия вставляется сбощиком
         window.addEventListener("message", this.setSettingsListener, false);
         this.API.addCSS(this.getCssByDomain(location.hostname));
 
@@ -825,6 +825,23 @@ __addons=[
         window.localStorage.setItem('__read_comments_' + qid, JSON.stringify(nowcomments));
         window.localStorage.setItem('__opened_' + qid, true);
     }
+},
+
+﻿{
+    name: 'SearchFromGoogle',
+    title: 'Поиск от Google',
+    description: 'Из строки поиска поиск будет осуществляться при помощи запроса вида <br/><pre>site:hashcode.ru запрос</pre><br/>что дает более релевантные результаты.',
+    settings: {
+      
+    },
+    exports: [],
+    run: function() {
+        $('#searchBar')[0].action= 'http://google.ru/';
+        $('#searchBar').submit(function () {
+            location.href= "http://google.ru/search?q=site%3Ahashcode.ru%20"+this.q.value;
+            return false;
+        });
+    } 
 },
 
 ﻿{
