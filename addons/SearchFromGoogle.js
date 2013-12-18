@@ -7,7 +7,6 @@
     },
     exports: [],
     run: function() {
-        $('#searchBar')[0].action= 'http://google.ru/';
         $('#searchBar').submit(function () {
             location.href= "http://google.ru/search?q=site%3A"+location.hostname+"%20"+this.q.value;
             return false;
