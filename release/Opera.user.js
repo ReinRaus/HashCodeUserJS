@@ -63,7 +63,7 @@ var __addons=['__developerMode', '__autocompleteWithLinks', '__syntaxHighlight',
             if (typeof(this.addons[__addons[i].name].namesResolver)!="function") this.addons[__addons[i].name].namesResolver= this.namesResolver;
             if (typeof(this.addons[__addons[i].name].drawer)!="function") this.addons[__addons[i].name].drawer= this.defaultDrawer;
         };
-        var build= parseInt("16"); // версия вставляется сбощиком
+        var build= parseInt("17"); // версия вставляется сбощиком
         window.addEventListener("message", this.setSettingsListener, false);
         this.API.addCSS(this.getCssByDomain(location.hostname));
 
@@ -115,10 +115,11 @@ var __addons=['__developerMode', '__autocompleteWithLinks', '__syntaxHighlight',
         for (var i in __addons) {
             $('#' + __addons[i].name + '').css("background", img_src);
             if (this.storage.enabledAddons[__addons[i].name] == "yes") {
-                if (typeof(__addons[i].run)=='function') __addons[i].run();
                 $('#' + __addons[i].name + '').removeClass("addon-checkbox").addClass("addon-checkbox-clicked");
             } else $('#' + __addons[i].name + '').removeClass("addon-checkbox-clicked").addClass("addon-checkbox");
         }
+		this.callEventIterator("run");
+		
         this.commitStorage();
 
         this.callEventIterator("afterInit");
@@ -195,6 +196,7 @@ var __addons=['__developerMode', '__autocompleteWithLinks', '__syntaxHighlight',
     },
     /** слушает когда придет сообщение установить настройки (используется в iframe для миграции) */
     setSettingsListener: function(message, url){
+	    if ( typeof( message.data ) !== "string") return;
         if (message.data.substring(0, 12)=="SetSettings:"){
             var storageOnlyExports= JSON.parse(message.data.substring(12));
             for (var i in storageOnlyExports){
@@ -295,7 +297,20 @@ var __addons=['__developerMode', '__autocompleteWithLinks', '__syntaxHighlight',
 
     callEventIterator: function(nameEvent) {
         for (var i=0; i<__addons.length; i++) {
-            if ( typeof(__addons[i][nameEvent])=="function" && this.storage.enabledAddons[__addons[i].name]=="yes") __addons[i][nameEvent]();
+		    if (this.storage.enabledAddons[__addons[i].name] == "yes" && typeof(__addons[i][nameEvent])=="function" ) {
+				try {
+					__addons[i][nameEvent]();
+				} catch(e) {
+					window.onerror= function (descr, page, line) {
+						console.log("Номер строки в функции "+nameEvent+": "+line);
+						return true;
+					};
+					console.log('Ошибка в аддоне "'+__addons[i].title+"\" ("+__addons[i].name+")\n"+e.name+" : "+e.message);
+					var fictiveScr= document.createElement('script');
+					fictiveScr.textContent= __addons[i][nameEvent].toString().replace(/^.*?\{|\}.*?$/g, '');
+					document.head.appendChild(fictiveScr);
+				};
+			};
         }
     },
 
