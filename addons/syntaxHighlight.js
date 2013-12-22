@@ -118,6 +118,7 @@
       var brushes = brush.split(' ');
       var codes = document.querySelectorAll("pre code");
       for (var i = 0; i < codes.length; i++) {
+          codes[i].innerHTML= codes[i].innerHTML.replace(/<a rel="noindex,nofollow" href="\/users\/[0-9]+\/[^"]+">(@[^<]+)<\/a>/i, "$1");
           codes[i].parentNode.classList.add("brush:")
 		  for(var j=0;j<brushes.length;j++){
 	          codes[i].parentNode.classList.add(brushes[j]);
