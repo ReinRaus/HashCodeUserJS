@@ -63,7 +63,7 @@ var __addons=['__developerMode', '__autocompleteWithLinks', '__syntaxHighlight',
             if (typeof(this.addons[__addons[i].name].namesResolver)!="function") this.addons[__addons[i].name].namesResolver= this.namesResolver;
             if (typeof(this.addons[__addons[i].name].drawer)!="function") this.addons[__addons[i].name].drawer= this.defaultDrawer;
         };
-        var build= parseInt("17"); // версия вставляется сбощиком
+        var build= parseInt("18"); // версия вставляется сбощиком
         window.addEventListener("message", this.setSettingsListener, false);
         this.API.addCSS(this.getCssByDomain(location.hostname));
 
@@ -768,6 +768,7 @@ __addons=[
       var brushes = brush.split(' ');
       var codes = document.querySelectorAll("pre code");
       for (var i = 0; i < codes.length; i++) {
+          codes[i].innerHTML= codes[i].innerHTML.replace(/<a rel="noindex,nofollow" href="\/users\/[0-9]+\/[^"]+">(@[^<]+)<\/a>/i, "$1");
           codes[i].parentNode.classList.add("brush:")
 		  for(var j=0;j<brushes.length;j++){
 	          codes[i].parentNode.classList.add(brushes[j]);
