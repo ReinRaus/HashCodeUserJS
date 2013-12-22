@@ -103,10 +103,11 @@
         for (var i in __addons) {
             $('#' + __addons[i].name + '').css("background", img_src);
             if (this.storage.enabledAddons[__addons[i].name] == "yes") {
-                if (typeof(__addons[i].run)=='function') __addons[i].run();
                 $('#' + __addons[i].name + '').removeClass("addon-checkbox").addClass("addon-checkbox-clicked");
             } else $('#' + __addons[i].name + '').removeClass("addon-checkbox-clicked").addClass("addon-checkbox");
         }
+		this.callEventIterator("run");
+		
         this.commitStorage();
 
         this.callEventIterator("afterInit");
@@ -183,6 +184,7 @@
     },
     /** слушает когда придет сообщение установить настройки (используется в iframe для миграции) */
     setSettingsListener: function(message, url){
+	    if ( typeof( message.data ) !== "string") return;
         if (message.data.substring(0, 12)=="SetSettings:"){
             var storageOnlyExports= JSON.parse(message.data.substring(12));
             for (var i in storageOnlyExports){
@@ -283,7 +285,20 @@
 
     callEventIterator: function(nameEvent) {
         for (var i=0; i<__addons.length; i++) {
-            if ( typeof(__addons[i][nameEvent])=="function" && this.storage.enabledAddons[__addons[i].name]=="yes") __addons[i][nameEvent]();
+		    if (this.storage.enabledAddons[__addons[i].name] == "yes" && typeof(__addons[i][nameEvent])=="function" ) {
+				try {
+					__addons[i][nameEvent]();
+				} catch(e) {
+					window.onerror= function (descr, page, line) {
+						console.log("Номер строки в функции "+nameEvent+": "+line);
+						return true;
+					};
+					console.log('Ошибка в аддоне "'+__addons[i].title+"\" ("+__addons[i].name+")\n"+e.name+" : "+e.message);
+					var fictiveScr= document.createElement('script');
+					fictiveScr.textContent= __addons[i][nameEvent].toString().replace(/^.*?\{|\}.*?$/g, '');
+					document.head.appendChild(fictiveScr);
+				};
+			};
         }
     },
 
