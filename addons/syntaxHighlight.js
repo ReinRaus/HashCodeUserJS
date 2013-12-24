@@ -80,7 +80,7 @@
       {
         brush = "php";
         brushPhp();
-      } else if (tags.indexOf('js')>=0 || tags.indexOf('javascript')>=0 || tags.indexOf('jquery')>=0)
+      } else if (tags.indexOf('js')>=0 || tags.indexOf('javascript')>=0 || tags.indexOf('jquery')>=0 || tags.indexOf('node.js')>=0)
       {
         brush = "js";
         brushJS();
