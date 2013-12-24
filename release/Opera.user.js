@@ -63,7 +63,7 @@ var __addons=['__developerMode', '__autocompleteWithLinks', '__syntaxHighlight',
             if (typeof(this.addons[__addons[i].name].namesResolver)!="function") this.addons[__addons[i].name].namesResolver= this.namesResolver;
             if (typeof(this.addons[__addons[i].name].drawer)!="function") this.addons[__addons[i].name].drawer= this.defaultDrawer;
         };
-        var build= parseInt("18"); // версия вставляется сбощиком
+        var build= parseInt("21"); // версия вставляется сбощиком
         window.addEventListener("message", this.setSettingsListener, false);
         this.API.addCSS(this.getCssByDomain(location.hostname));
 
@@ -730,7 +730,7 @@ __addons=[
       {
         brush = "php";
         brushPhp();
-      } else if (tags.indexOf('js')>=0 || tags.indexOf('javascript')>=0 || tags.indexOf('jquery')>=0)
+      } else if (tags.indexOf('js')>=0 || tags.indexOf('javascript')>=0 || tags.indexOf('jquery')>=0 || tags.indexOf('node.js')>=0)
       {
         brush = "js";
         brushJS();
