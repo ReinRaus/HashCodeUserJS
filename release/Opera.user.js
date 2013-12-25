@@ -63,7 +63,7 @@ var __addons=['__developerMode', '__autocompleteWithLinks', '__syntaxHighlight',
             if (typeof(this.addons[__addons[i].name].namesResolver)!="function") this.addons[__addons[i].name].namesResolver= this.namesResolver;
             if (typeof(this.addons[__addons[i].name].drawer)!="function") this.addons[__addons[i].name].drawer= this.defaultDrawer;
         };
-        var build= parseInt("21"); // версия вставляется сбощиком
+        var build= parseInt("22"); // версия вставляется сбощиком
         window.addEventListener("message", this.setSettingsListener, false);
         this.API.addCSS(this.getCssByDomain(location.hostname));
 
@@ -652,7 +652,14 @@ __addons=[
     name: 'syntaxHighlight',
     title: 'Подсветка синтаксиса SyntaxHighlighter\'ом',
     description: 'Автопределение языка подсветки по тэгам вопроса\nПоддержка языков: text/plain, html+js, js, c/c++/objective-c, c#, ruby, python, php, pascal/delphi/freepascal',
+    settings: {
+        'usePretty' : '1'
+    },
+    exports: [
+        {name: "usePretty", type: "checkbox", title: "Использовать стандартную подсветку, если стиль не определен."}
+    ],
     beforeInit: function(){
+      window.prettyPrintBackup = window.prettyPrint;
       window.prettyPrint = function() {};
       window.addonsLoader.API.addStyleSheet("http://cdnjs.cloudflare.com/ajax/libs/SyntaxHighlighter/3.0.83/styles/shCore.min.css");
       window.addonsLoader.API.addStyleSheet("http://cdnjs.cloudflare.com/ajax/libs/SyntaxHighlighter/3.0.83/styles/shThemeDefault.min.css");
@@ -769,11 +776,15 @@ __addons=[
       var codes = document.querySelectorAll("pre code");
       for (var i = 0; i < codes.length; i++) {
           codes[i].innerHTML= codes[i].innerHTML.replace(/<a rel="noindex,nofollow" href="\/users\/[0-9]+\/[^"]+">(@[^<]+)<\/a>/i, "$1");
-          codes[i].parentNode.classList.add("brush:")
-		  for(var j=0;j<brushes.length;j++){
-	          codes[i].parentNode.classList.add(brushes[j]);
-		  }
-          codes[i].parentNode.innerHTML = codes[i].innerHTML+'\n';
+          if ( brush=='plain' && this.settings.usePretty==1 ) {
+              window.prettyPrintBackup();
+          } else {
+              codes[i].parentNode.classList.add("brush:")
+    		  for(var j=0;j<brushes.length;j++){
+    	          codes[i].parentNode.classList.add(brushes[j]);
+    		  }
+              codes[i].parentNode.innerHTML = codes[i].innerHTML+'\n';
+          }
       }
       SyntaxHighlighter.defaults['toolbar'] = false;
       SyntaxHighlighter.all();
