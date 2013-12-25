@@ -63,7 +63,7 @@ var __addons=['__developerMode', '__autocompleteWithLinks', '__syntaxHighlight',
             if (typeof(this.addons[__addons[i].name].namesResolver)!="function") this.addons[__addons[i].name].namesResolver= this.namesResolver;
             if (typeof(this.addons[__addons[i].name].drawer)!="function") this.addons[__addons[i].name].drawer= this.defaultDrawer;
         };
-        var build= parseInt("22"); // версия вставляется сбощиком
+        var build= parseInt("23"); // версия вставляется сбощиком
         window.addEventListener("message", this.setSettingsListener, false);
         this.API.addCSS(this.getCssByDomain(location.hostname));
 
@@ -653,17 +653,19 @@ __addons=[
     title: 'Подсветка синтаксиса SyntaxHighlighter\'ом',
     description: 'Автопределение языка подсветки по тэгам вопроса\nПоддержка языков: text/plain, html+js, js, c/c++/objective-c, c#, ruby, python, php, pascal/delphi/freepascal',
     settings: {
-        'usePretty' : '1'
+        'usePretty' : '1',
+        'wrapText'  : '1'
     },
     exports: [
-        {name: "usePretty", type: "checkbox", title: "Использовать стандартную подсветку, если стиль не определен."}
+        {name: "usePretty", type: "checkbox", title: "Использовать стандартную подсветку, если стиль не определен:"},
+        {name: "wrapText", type: "checkbox", title: "Переносить текст по словам:"}
     ],
     beforeInit: function(){
       window.prettyPrintBackup = window.prettyPrint;
       window.prettyPrint = function() {};
+      if ( this.settings.wrapText !== '1' ) window.addonsLoader.API.addCSS("code {white-space: nowrap}");
       window.addonsLoader.API.addStyleSheet("http://cdnjs.cloudflare.com/ajax/libs/SyntaxHighlighter/3.0.83/styles/shCore.min.css");
       window.addonsLoader.API.addStyleSheet("http://cdnjs.cloudflare.com/ajax/libs/SyntaxHighlighter/3.0.83/styles/shThemeDefault.min.css");
-      window.addonsLoader.API.addCSS("code {white-space: nowrap}");
       window.addonsLoader.API.addCSS(".syntaxhighlighter {width: 695px !important;overflow-x:auto !important;overflow-y:hidden !important}");
       window.addonsLoader.API.addCSS(".syntaxhighlighter table {border-spacing: 2px;}");
       window.addonsLoader.API.addCSS(".comment-text .syntaxhighlighter {width: 677px !important;overflow-x:auto !important;overflow-y:hidden !important}");
@@ -788,6 +790,8 @@ __addons=[
       }
       SyntaxHighlighter.defaults['toolbar'] = false;
       SyntaxHighlighter.all();
+      window.prettyPrint = window.prettyPrintBackup;
+      window.addonsLoader.API.addCSS("code {white-space: inherit}");
     }
 },
 
