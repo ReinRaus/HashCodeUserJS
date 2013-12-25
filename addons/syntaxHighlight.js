@@ -13,7 +13,7 @@
     beforeInit: function(){
       window.prettyPrintBackup = window.prettyPrint;
       window.prettyPrint = function() {};
-      if ( this.settings.wrapText !== '1' ) window.addonsLoader.API.addCSS("code {white-space: nowrap}");
+      if ( this.settings.wrapText !== '1' ) window.addonsLoader.API.addCSS("code {white-space: nowrap} .wmd-preview pre code {white-space: pre-wrap}");
       window.addonsLoader.API.addStyleSheet("http://cdnjs.cloudflare.com/ajax/libs/SyntaxHighlighter/3.0.83/styles/shCore.min.css");
       window.addonsLoader.API.addStyleSheet("http://cdnjs.cloudflare.com/ajax/libs/SyntaxHighlighter/3.0.83/styles/shThemeDefault.min.css");
       window.addonsLoader.API.addCSS(".syntaxhighlighter {width: 695px !important;overflow-x:auto !important;overflow-y:hidden !important}");
@@ -141,6 +141,5 @@
       SyntaxHighlighter.defaults['toolbar'] = false;
       SyntaxHighlighter.all();
       window.prettyPrint = window.prettyPrintBackup;
-      window.addonsLoader.API.addCSS("code {white-space: inherit}");
     }
 }
