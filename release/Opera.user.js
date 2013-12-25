@@ -63,7 +63,7 @@ var __addons=['__developerMode', '__autocompleteWithLinks', '__syntaxHighlight',
             if (typeof(this.addons[__addons[i].name].namesResolver)!="function") this.addons[__addons[i].name].namesResolver= this.namesResolver;
             if (typeof(this.addons[__addons[i].name].drawer)!="function") this.addons[__addons[i].name].drawer= this.defaultDrawer;
         };
-        var build= parseInt("23"); // версия вставляется сбощиком
+        var build= parseInt("24"); // версия вставляется сбощиком
         window.addEventListener("message", this.setSettingsListener, false);
         this.API.addCSS(this.getCssByDomain(location.hostname));
 
@@ -663,7 +663,7 @@ __addons=[
     beforeInit: function(){
       window.prettyPrintBackup = window.prettyPrint;
       window.prettyPrint = function() {};
-      if ( this.settings.wrapText !== '1' ) window.addonsLoader.API.addCSS("code {white-space: nowrap}");
+      if ( this.settings.wrapText !== '1' ) window.addonsLoader.API.addCSS("code {white-space: nowrap} .wmd-preview pre code {white-space: pre-wrap}");
       window.addonsLoader.API.addStyleSheet("http://cdnjs.cloudflare.com/ajax/libs/SyntaxHighlighter/3.0.83/styles/shCore.min.css");
       window.addonsLoader.API.addStyleSheet("http://cdnjs.cloudflare.com/ajax/libs/SyntaxHighlighter/3.0.83/styles/shThemeDefault.min.css");
       window.addonsLoader.API.addCSS(".syntaxhighlighter {width: 695px !important;overflow-x:auto !important;overflow-y:hidden !important}");
@@ -791,7 +791,6 @@ __addons=[
       SyntaxHighlighter.defaults['toolbar'] = false;
       SyntaxHighlighter.all();
       window.prettyPrint = window.prettyPrintBackup;
-      window.addonsLoader.API.addCSS("code {white-space: inherit}");
     }
 },
 
