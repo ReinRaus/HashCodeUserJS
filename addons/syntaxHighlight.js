@@ -2,7 +2,14 @@
     name: 'syntaxHighlight',
     title: 'Подсветка синтаксиса SyntaxHighlighter\'ом',
     description: 'Автопределение языка подсветки по тэгам вопроса\nПоддержка языков: text/plain, html+js, js, c/c++/objective-c, c#, ruby, python, php, pascal/delphi/freepascal',
+    settings: {
+        'usePretty' : '1'
+    },
+    exports: [
+        {name: "usePretty", type: "checkbox", title: "Использовать стандартную подсветку, если стиль не определен."}
+    ],
     beforeInit: function(){
+      window.prettyPrintBackup = window.prettyPrint;
       window.prettyPrint = function() {};
       window.addonsLoader.API.addStyleSheet("http://cdnjs.cloudflare.com/ajax/libs/SyntaxHighlighter/3.0.83/styles/shCore.min.css");
       window.addonsLoader.API.addStyleSheet("http://cdnjs.cloudflare.com/ajax/libs/SyntaxHighlighter/3.0.83/styles/shThemeDefault.min.css");
@@ -119,11 +126,15 @@
       var codes = document.querySelectorAll("pre code");
       for (var i = 0; i < codes.length; i++) {
           codes[i].innerHTML= codes[i].innerHTML.replace(/<a rel="noindex,nofollow" href="\/users\/[0-9]+\/[^"]+">(@[^<]+)<\/a>/i, "$1");
-          codes[i].parentNode.classList.add("brush:")
-		  for(var j=0;j<brushes.length;j++){
-	          codes[i].parentNode.classList.add(brushes[j]);
-		  }
-          codes[i].parentNode.innerHTML = codes[i].innerHTML+'\n';
+          if ( brush=='plain' && this.settings.usePretty==1 ) {
+              window.prettyPrintBackup();
+          } else {
+              codes[i].parentNode.classList.add("brush:")
+    		  for(var j=0;j<brushes.length;j++){
+    	          codes[i].parentNode.classList.add(brushes[j]);
+    		  }
+              codes[i].parentNode.innerHTML = codes[i].innerHTML+'\n';
+          }
       }
       SyntaxHighlighter.defaults['toolbar'] = false;
       SyntaxHighlighter.all();
