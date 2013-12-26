@@ -63,7 +63,7 @@ var __addons=['__developerMode', '__autocompleteWithLinks', '__syntaxHighlight',
             if (typeof(this.addons[__addons[i].name].namesResolver)!="function") this.addons[__addons[i].name].namesResolver= this.namesResolver;
             if (typeof(this.addons[__addons[i].name].drawer)!="function") this.addons[__addons[i].name].drawer= this.defaultDrawer;
         };
-        var build= parseInt("27"); // версия вставляется сбощиком
+        var build= parseInt("28"); // версия вставляется сбощиком
         window.addEventListener("message", this.setSettingsListener, false);
         this.API.addCSS(this.getCssByDomain(location.hostname));
 
@@ -649,8 +649,8 @@ __addons=[
 },
 
 ﻿{
-    name: 'syntaxHighlight2',
-    title: 'Подсветка синтаксиса SyntaxHighlighter\'ом2',
+    name: 'syntaxHighlight',
+    title: 'Подсветка синтаксиса SyntaxHighlighter\'ом',
     description: 'Автопределение языка подсветки по тэгам вопроса\nПоддержка языков: text/plain, html+js, js, c/c++/objective-c, c#, ruby, python, php, pascal/delphi/freepascal',
     settings: {
         'usePretty' : '1',
