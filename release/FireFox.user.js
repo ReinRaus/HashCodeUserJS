@@ -63,7 +63,7 @@ var __addons=['__developerMode', '__autocompleteWithLinks', '__syntaxHighlight',
             if (typeof(this.addons[__addons[i].name].namesResolver)!="function") this.addons[__addons[i].name].namesResolver= this.namesResolver;
             if (typeof(this.addons[__addons[i].name].drawer)!="function") this.addons[__addons[i].name].drawer= this.defaultDrawer;
         };
-        var build= parseInt("25"); // версия вставляется сбощиком
+        var build= parseInt("26"); // версия вставляется сбощиком
         window.addEventListener("message", this.setSettingsListener, false);
         this.API.addCSS(this.getCssByDomain(location.hostname));
 
@@ -790,12 +790,15 @@ __addons=[
       }
       SyntaxHighlighter.defaults['toolbar'] = false;
       SyntaxHighlighter.all();
-      if ( this.settings.wrapText == '1' ) {
-        var linesChecker;
-        linesChecker =  function() {
+      this.fixGutterHeight();
+      window.prettyPrint = window.prettyPrintBackup;
+    },
+    
+    fixGutterHeight: function() {
+        if ( this.settings.wrapText == '1' ) {
             $gutter = $('.syntaxhighlighter .gutter .line');
             if ( $gutter.length==0  && codes.length>0) {
-                window.setTimeout( linesChecker, 250);
+                window.setTimeout( this.fixGutterHeight, 250);
                 return;
             };
             $code   = $('.syntaxhighlighter .code   .line');
@@ -806,9 +809,6 @@ __addons=[
                 };
             };
         };
-        linesChecker();
-      };
-      window.prettyPrint = window.prettyPrintBackup;
     }
 },
 
