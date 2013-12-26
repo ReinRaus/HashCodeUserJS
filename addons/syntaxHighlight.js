@@ -132,14 +132,32 @@
               window.prettyPrintBackup();
           } else {
               codes[i].parentNode.classList.add("brush:")
-    		  for(var j=0;j<brushes.length;j++){
-    	          codes[i].parentNode.classList.add(brushes[j]);
-    		  }
+              for(var j=0;j<brushes.length;j++){
+                      codes[i].parentNode.classList.add(brushes[j]);
+              }
               codes[i].parentNode.innerHTML = codes[i].innerHTML+'\n';
           }
       }
       SyntaxHighlighter.defaults['toolbar'] = false;
       SyntaxHighlighter.all();
+      if ( this.settings.wrapText == '1' ) {
+        var linesChecker;
+        linesChecker =  function() {
+            $gutter = $('.syntaxhighlighter .gutter .line');
+            if ( $gutter.length==0  && codes.length>0) {
+                window.setTimeout( linesChecker, 250);
+                return;
+            };
+            $code   = $('.syntaxhighlighter .code   .line');
+            var size = $gutter.length;
+            for (var i=0; i<size; i++) {
+                if ( $gutter[i].offsetHeight!==$code[i].offsetHeight ) {
+                    $gutter[i].style.cssText = "height:"+$code[i].offsetHeight+'px!important';
+                };
+            };
+        };
+        linesChecker();
+      };
       window.prettyPrint = window.prettyPrintBackup;
     }
 }
