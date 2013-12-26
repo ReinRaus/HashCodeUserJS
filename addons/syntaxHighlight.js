@@ -1,14 +1,18 @@
 ﻿{
-    name: 'syntaxHighlight',
-    title: 'Подсветка синтаксиса SyntaxHighlighter\'ом',
+    name: 'syntaxHighlight2',
+    title: 'Подсветка синтаксиса SyntaxHighlighter\'ом2',
     description: 'Автопределение языка подсветки по тэгам вопроса\nПоддержка языков: text/plain, html+js, js, c/c++/objective-c, c#, ruby, python, php, pascal/delphi/freepascal',
     settings: {
         'usePretty' : '1',
-        'wrapText'  : '1'
+        'wrapText'  : '1',
+        'noGutter'  : '0',
+        'noGutterInComments' : '1'
     },
     exports: [
         {name: "usePretty", type: "checkbox", title: "Использовать стандартную подсветку, если стиль не определен:"},
-        {name: "wrapText", type: "checkbox", title: "Переносить текст по словам:"}
+        {name: "wrapText", type: "checkbox", title: "Переносить текст по словам:"},
+        {name: "noGutter", type: "checkbox", title: "Не нумеровать строки:"},
+        {name: "noGutterInComments", type: "checkbox", title: "Не нумеровать строки в комментариях:"}
     ],
     beforeInit: function(){
       window.prettyPrintBackup = window.prettyPrint;
@@ -124,17 +128,23 @@
       } else {
         brushPlain();
       }
+      if ( this.settings.noGutter=='1' ) brush+= ' gutter:false';
       var brushes = brush.split(' ');
       var codes = document.querySelectorAll("pre code");
+      this.codesLength = codes.length;
       for (var i = 0; i < codes.length; i++) {
           codes[i].innerHTML= codes[i].innerHTML.replace(/<a rel="noindex,nofollow" href="\/users\/[0-9]+\/[^"]+">(@[^<]+)<\/a>/i, "$1");
           if ( brush=='plain' && this.settings.usePretty==1 ) {
               window.prettyPrintBackup();
           } else {
-              codes[i].parentNode.classList.add("brush:")
+              var cl = "brush:";
               for(var j=0;j<brushes.length;j++){
-                      codes[i].parentNode.classList.add(brushes[j]);
+                      cl+= brushes[j]+";";
               }
+              if ( this.settings.noGutterInComments=='1' && codes[i].parentNode.parentNode.className=='comment-text') {
+                  cl+= " gutter:false;";
+              };
+              codes[i].parentNode.className= cl;
               codes[i].parentNode.innerHTML = codes[i].innerHTML+'\n';
           }
       }
@@ -145,19 +155,27 @@
     },
     
     fixGutterHeight: function() {
-        if ( this.settings.wrapText == '1' ) {
-            $gutter = $('.syntaxhighlighter .gutter .line');
-            if ( $gutter.length==0  && codes.length>0) {
-                window.setTimeout( this.fixGutterHeight, 250);
-                return;
-            };
-            $code   = $('.syntaxhighlighter .code   .line');
-            var size = $gutter.length;
-            for (var i=0; i<size; i++) {
-                if ( $gutter[i].offsetHeight!==$code[i].offsetHeight ) {
-                    $gutter[i].style.cssText = "height:"+$code[i].offsetHeight+'px!important';
+        var fixer;
+        var context= this;
+        var fixer = function() {
+            if ( context.settings.wrapText == '1' ) {
+                var $code = $('div.syntaxhighlighter td.gutter + td.code');
+                if ( $code.length==0  && context.codesLength>0) {
+                    window.setTimeout( fixer, 250);
+                    return;
+                };
+                for (var i=0; i<$code.length; i++) {
+                    var $lineCode= $($code[i]).find('.line');
+                    var $lineGutter= $($code[i].previousSibling).find('.line');
+                    var size = $lineCode.length;
+                    for (var j=0; j<size; j++) {
+                        if ( $lineGutter[j].offsetHeight!==$lineCode[j].offsetHeight ) {
+                            $lineGutter[j].style.cssText = "height:"+$lineCode[j].offsetHeight+'px!important';
+                        };
+                    };
                 };
             };
         };
+        fixer();
     }
 }
