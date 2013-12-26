@@ -140,12 +140,15 @@
       }
       SyntaxHighlighter.defaults['toolbar'] = false;
       SyntaxHighlighter.all();
-      if ( this.settings.wrapText == '1' ) {
-        var linesChecker;
-        linesChecker =  function() {
+      this.fixGutterHeight();
+      window.prettyPrint = window.prettyPrintBackup;
+    },
+    
+    fixGutterHeight: function() {
+        if ( this.settings.wrapText == '1' ) {
             $gutter = $('.syntaxhighlighter .gutter .line');
             if ( $gutter.length==0  && codes.length>0) {
-                window.setTimeout( linesChecker, 250);
+                window.setTimeout( this.fixGutterHeight, 250);
                 return;
             };
             $code   = $('.syntaxhighlighter .code   .line');
@@ -156,8 +159,5 @@
                 };
             };
         };
-        linesChecker();
-      };
-      window.prettyPrint = window.prettyPrintBackup;
     }
 }
