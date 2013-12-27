@@ -30,6 +30,7 @@
             if (typeof(addonsSettings[__addons[i].name])=="undefined") {
                 addonsSettings[__addons[i].name]= {};
             }
+            if (typeof(__addons[i].settings)=="undefined") __addons[i].settings={};
             for (var j in addonsSettings[__addons[i].name]) {
                 __addons[i].settings[j]= addonsSettings[__addons[i].name][j]; // переносим сохраненные настройки в аддон
             }
